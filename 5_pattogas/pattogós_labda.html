@@ -18,12 +18,41 @@
             margin-top: 0%;
         }
     </style>
+    <script>
+        function klikkelés(x) {
+            kör_létrehozás(x);
+        }
+    </script>
 </head>
 
 <body>
     <svg id="rajzlap" viewBox="0 0 300 300">
     </svg>
     <script> 
+        var szélesség = window.innerWidth;
+        var rajzlap_balszél = szélesség / 2 - 150;
+        var hosszúság = window.innerHeight;
+        var rajzlap_teteje = hosszúság / 2 - 150;
+        var rajzlap = document.getElementById("rajzlap");
+        rajzlap.onmouseup = klikkelés;
+
+        var körök = new Array();
+        var i = 0;
+
+        function kör_létrehozás(x) {
+
+            var x_koordináta = x.pageX - rajzlap_balszél;
+            var y_koordináta = x.pageY - rajzlap_teteje;
+            körök[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            körök[i].setAttribute("cx", x_koordináta.toString());
+            körök[i].setAttribute("cy", y_koordináta.toString());
+            körök[i].setAttribute("r", 6);
+            körök[i].setAttribute('id', i.toString());
+
+            rajzlap.appendChild(körök[i]);
+
+            i++;
+        }
 
 
     </script>
