@@ -1,0 +1,127 @@
+<html>
+
+<head>
+    <title>szakasz_metszés</title>
+
+    <style>
+        #rajzlap {
+            border: 1px solid rgb(96, 212, 247);
+            width: 500px;
+            height: 500px;
+        }
+    </style>
+
+    <script>
+        var i = 1;
+        function klikkelés(x) {
+            tárolás(x);
+            kiiras();
+            kör_rajz();
+            if (i % 2 == 0) {
+                szakasz_rajzoló();
+                szakasz_tároló();
+                szakasz_kiíró();
+                metszés_pont();
+            }
+            i++;
+        }
+    </script>
+</head>
+
+<body>
+    <svg id="rajzlap" viewBox="0 0 500 500" onclick="klikkelés(event)">
+    </svg>
+    <p>katt az egérrel a rajzlapra</p>
+
+    <script>
+
+        var legyen_e_végpont = confirm("Szeretnéd látni a kattintás helyét?");
+
+        var tömb_x = new Array();
+        var tömb_y = new Array();
+        var rajzlap = document.getElementById("rajzlap");
+
+        function szakasz(kezdőpont_x_koord, kezdőpont_y_koord, végpont_x_koord, végpont_y_koord) {
+            this.kp_x = kezdőpont_x_koord;
+            this.kp_y = kezdőpont_y_koord;
+            this.vp_x = végpont_x_koord;
+            this.vp_y = végpont_y_koord;
+            this.mer = (this.vp_y - this.kp_y) / (this.vp_x - this.kp_x); //meredekség
+            this.con = this.kp_y - this.kp_x * this.mer; //konstans tag
+        }
+
+        function ket_egyenes_metszespontja(a, b, c, d) { //f(x)=ax+b és g(x)=cx+d
+            m = new Array();
+            m[0] = (d - b) / (a - c);
+            m[1] = b + a * (d - b) / (a - c);
+            return m;
+        }
+
+        function tárolás(x) {
+            tömb_x[i] = x.clientX - 9;
+            tömb_y[i] = x.clientY - 9;
+        }
+
+        function kiiras() {
+            document.getElementById("koordináták").innerHTML = tömb_x[i] + ", " + tömb_y[i] + ", " + i;
+
+        }
+
+        function kör_rajz() {
+            if (legyen_e_végpont) {
+                var kör = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                kör.setAttribute("cx", tömb_x[i].toString());
+                kör.setAttribute("cy", tömb_y[i].toString());
+                kör.setAttribute("r", 1);
+                rajzlap.appendChild(kör);
+            }
+        }
+
+        function szakasz_rajzoló() {
+                var sz_rajz = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                sz_rajz.setAttribute("x1", tömb_x[i - 1].toString());
+                sz_rajz.setAttribute("y1", tömb_y[i - 1].toString());
+                sz_rajz.setAttribute("x2", tömb_x[i].toString());
+                sz_rajz.setAttribute("y2", tömb_y[i].toString());
+                sz_rajz.setAttribute("stroke", "black");
+                rajzlap.appendChild(sz_rajz);
+        }
+
+        var szakasz_tömb = new Array();
+        var j = 0;
+        function szakasz_tároló() {
+                szakasz_tömb[j] = new szakasz(tömb_x[i - 1], tömb_y[i - 1], tömb_x[i], tömb_y[i]);
+                j++;
+        }
+
+        function szakasz_kiíró() {
+                var k = i / 2 - 1;
+                document.getElementById("szakaszok").innerHTML = szakasz_tömb[k].kp_x + ", " + szakasz_tömb[k].kp_y + ", " + szakasz_tömb[k].vp_x + ", " + szakasz_tömb[k].vp_y + ", " + j;
+        }
+
+        function metszés_pont() {
+                var mp_x = new Array(); //itt a metszespontok x-koordinátáit tároljuk
+                var mp_y = new Array(); //itt a metszespontok y-koordinátáit tároljuk
+                var m_rajz = new Array(); //amiket ki fogunk rajzolni metszéspontok
+                var l;
+                for (l = 0; l < j - 1; l++) {
+                    var metszet = new Array();
+                    metszet = ket_egyenes_metszespontja(szakasz_tömb[l].mer, szakasz_tömb[l].con, szakasz_tömb[j - 1].mer, szakasz_tömb[j - 1].con);
+                    mp_x[l] = metszet[0];
+                    mp_y[l] = metszet[1];
+
+                    m_rajz[l] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                    m_rajz[l].setAttribute("cx", mp_x[l].toString());
+                    m_rajz[l].setAttribute("cy", mp_y[l].toString());
+                    m_rajz[l].setAttribute("r", 2);
+                    rajzlap.appendChild(m_rajz[l]);
+            }
+        }
+    </script>
+
+    <p id="koordináták">ide fogjuk kiírni a legutóbbi kattintás koordinátáit</p>
+    <p id="szakaszok">ide fogjuk kiírni a legutóbbi szakasz koordinátáit</p>
+
+</body>
+
+</html>
