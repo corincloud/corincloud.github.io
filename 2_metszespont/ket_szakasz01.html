@@ -1,0 +1,62 @@
+<html>
+
+<head></head>
+
+<body>
+    <script>
+        function main() {
+
+            var sz1_k_x = prompt("Adja meg az első szakasz kezdőpontjának x koordinátáját");
+            sz1_k_x = parseInt(sz1_k_x);
+            var sz1_k_y = prompt("Adja meg az első szakasz kezdőpontjának y koordinátáját");
+            sz1_k_y = parseInt(sz1_k_y);
+            var sz1_v_x = prompt("Adja meg az első szakasz végpontjának x koordinátáját");
+            sz1_v_x = parseInt(sz1_v_x);
+            var sz1_v_y = prompt("Adja meg az első szakasz végpontjának y koordinátáját");
+            sz1_v_y = parseInt(sz1_v_y);
+            var sz2_k_x = prompt("Adja meg a második szakasz kezdőpontjának x koordinátáját");
+            sz2_k_x = parseInt(sz2_k_x);
+            var sz2_k_y = prompt("Adja meg a második szakasz kezdőpontjának y koordinátáját");
+            sz2_k_y = parseInt(sz2_k_y);
+            var sz2_v_x = prompt("Adja meg a második szakasz végpontjának x koordinátáját");
+            sz2_v_x = parseInt(sz2_v_x);
+            var sz2_v_y = prompt("Adja meg a második szakasz végpontjának y koordinátáját");
+            sz2_v_y = parseInt(sz2_v_y);
+
+            function szakasz(kezdőpont_x_koord, kezdőpont_y_koord, végpont_x_koord, végpont_y_koord){
+                this.kp_x = kezdőpont_x_koord;
+                this.kp_y = kezdőpont_y_koord;
+                this.vp_x = végpont_x_koord;
+                this.vp_y = végpont_y_koord;
+                this.mer = (this.vp_y - this.kp_y)/(this.vp_x - this.kp_x); //meredekség
+                this.con = this.kp_y - this.kp_x*this.mer; //konstans tag
+            }
+
+            var sz1 = new szakasz(sz1_k_x, sz1_k_y, sz1_v_x, sz1_v_y);
+            var sz2 = new szakasz(sz2_k_x, sz2_k_y, sz2_v_x, sz2_v_y);
+
+            function ket_egyenes_metszespontja(a, b, c, d){ //f(x)=ax+b és g(x)=cx+d
+                m = new Array();
+                m[0] = (d - b)/(a - c);
+                m[1] = b + a*(d -b)/(a - c);
+                return m;
+            }
+           
+            function ket_szakasz_metszes_pontja(p, q) {
+                mp = new Array();
+                mp = ket_egyenes_metszespontja(p.mer, p.con, q.mer, q.con); //p és q szakaszokra illesztett egyenesek metszéspontja
+                if((p.kp_x <= mp[0])&&(p.vp_x >= mp[0])&&(q.kp_x <= mp[0])&&(q.vp_x >= mp[0])){
+                    return mp;
+                }
+                else{
+                    return "nem metszik egymást";
+                }
+            }
+
+            document.write(ket_szakasz_metszes_pontja(sz1, sz2));
+        }
+        main();
+    </script>
+</body>
+
+</html>
