@@ -34,48 +34,77 @@
         var hosszúság = window.innerHeight;
         var rajzlap_teteje = hosszúság / 2 - 150;
         var rajzlap = document.getElementById("rajzlap");
-        rajzlap.onmousedown = klikkelés;
+        rajzlap.onmousedown = kör_létrehozás;
 
-        var körök = new Array();
-        var i = 0;
+        
 
-        function szimulacio() {
+        var korok_szama = 0;
+        var sebessegek = [];
+        var x_poziciok = [];
+        var y_poziciok = [];
+        var gyorsulasok = [];
+
+        
+        function szimulacio_indito() {
+            var aktualis_ido = Date.now();
+            var szimulacio_differencia = (aktualis_ido - legutobbi_szimulacio) / 1000;
+            szimulacio(szimulacio_differencia);
+            legutobbi_szimulacio = aktualis_ido;
+        }
+
+        function szimulacio(ido_kulonbseg) {
+            for(var i = 0; i < korok_szama; i++) {
+                var a = gyorsulasok[i];
+                var v0 = sebessegek[i];
+                var s0 = y_poziciok[i];
+                var t = ido_kulonbseg;
+
+                var s = 0.5 * a * t * t + v0 * t + s0;
+                var v = a * t + v0;
+
+                y_poziciok[i] = s;
+                sebessegek[i] = v;
+
+                kor_pozicio_frissites(i);
+            }
+        }
+
+        function pixel_to_meter(pixel) {
+            return pixel / 100;
+        }
+
+        function meter_to_pixel(meter) {
+            return meter * 100;
+        }
+
+        function kor_pozicio_frissites(i) {
+            var kör = document.getElementById("kor_" + i);
+
+            kör.setAttribute("cx", meter_to_pixel(x_poziciok[i]).toString());
+            kör.setAttribute("cy", meter_to_pixel(y_poziciok[i]).toString());
+        }
+
+        function kör_létrehozás(e) {
+            var x_koordináta = e.pageX - rajzlap_balszél;
+            var y_koordináta = e.pageY - rajzlap_teteje;
             
+            x_poziciok[korok_szama] = pixel_to_meter(x_koordináta);
+            y_poziciok[korok_szama] = pixel_to_meter(y_koordináta);
+            sebessegek[korok_szama] = 0;
+            gyorsulasok[korok_szama] = 10;
+
+            var kör = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            kör.setAttribute("r", 6);
+            kör.setAttribute('id', "kor_" + korok_szama);
+            rajzlap.appendChild(kör);
+
+            kor_pozicio_frissites(korok_szama);
+        
+            korok_szama++;
         }
 
-        function kör_létrehozás(x) {
-
-            var x_koordináta = x.pageX - rajzlap_balszél;
-            var y_koordináta = x.pageY - rajzlap_teteje;
-            körök[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-            körök[i].setAttribute("cx", x_koordináta.toString());
-            körök[i].setAttribute("cy", y_koordináta.toString());
-            körök[i].setAttribute("r", 6);
-            körök[i].setAttribute('id', i.toString());
-
-            rajzlap.appendChild(körök[i]);
-            körök[i].onmouseup = leesés;
-
-            i++;
-        }
-
-        var aktualis = 0;
-        function leesés() {
-            event.target.setAttribute("fill", "#CCC");
-            aktualis = parseInt(event.target.getAttribute('id'));
-            var target = document.getElementById(aktualis.toString());
-            var anonymus = function(){
-                kör_lefele(target);
-            };
-            var változó = setInterval(anonymus, 20);
-        }
-
-        function kör_lefele(t) {
-            var y = t.getAttribute('cy');
-            y = parseInt(y) + 1;
-            t.setAttribute("cy", y.toString());
-
-        }
+        var legutobbi_szimulacio = Date.now();
+        setInterval(szimulacio_indito, 10);
 
 
     </script>
