@@ -1,0 +1,40 @@
+<html>
+
+<head></head>
+
+<body>
+    <script>
+        function main() {
+
+            var szam = prompt("Adjon meg egy pozitív egész számot");
+            szam = parseInt(szam);
+
+            var tizedes = prompt("Hány tizedesjegy pontosságot szeretne?");
+            tizedes = parseInt(tizedes);
+
+            var k_dik = prompt("Hanyadik gyököt számoljak? (1-nél nagyobb egész szám)");
+            k_dik = parseInt(k_dik);
+
+            function k_gyök_n_tizedes(x, n, k) {
+                n_tizedes = new Array();
+                n_tizedes[0] = 0;
+                for(var j = 1; j <= n + 1; j++){
+                    var t = 0;
+                    while (Math.pow(n_tizedes[j - 1] + t / (Math.pow(10, (j - 1))), k) <= x) {
+                        t++;
+                    }
+                    n_tizedes[j] = n_tizedes[j - 1] + (t - 1) / (Math.pow(10, (j -1)));
+                }
+                return n_tizedes[n + 1];
+            }
+
+           
+            document.write(Math.pow(szam, (1 / k_dik)) + "</br>");
+            document.write(k_gyök_n_tizedes(szam, tizedes, k_dik));
+
+        }
+        main();
+    </script>
+</body>
+
+</html>
