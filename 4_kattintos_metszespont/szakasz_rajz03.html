@@ -1,0 +1,163 @@
+<html>
+
+<head>
+    <title>szakasz_kirajzolása</title>
+
+    <style>
+        #rajzlap {
+            display: block;
+            border: 1px solid rgb(96, 212, 247);
+            width: 300px;
+            height: 300px;
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        body {
+            margin-top: 0%;
+        }
+    </style>
+
+    <script>
+        function klikkelés(x) {
+            kör_létrehozás(x);
+        }
+        function koordináták(x) {
+            kiiras(x);
+        }
+    </script>
+</head>
+
+<body>
+    <svg id="rajzlap" viewBox="0 0 300 300">
+    </svg>
+    <script>
+        var szélesség = window.innerWidth;
+        var rajzlap_balszél = szélesség / 2 - 150;
+        var hosszúság = window.innerHeight;
+        var rajzlap_teteje = hosszúság / 2 - 150;
+
+        var rajzlap = document.getElementById("rajzlap");
+        rajzlap.onmouseup = klikkelés;
+        window.addEventListener("mousemove", koordináták);
+
+
+        function kiiras(x) {
+            var x_koordináta = x.pageX - rajzlap_balszél;
+            var y_koordináta = x.pageY - rajzlap_teteje;
+            document.getElementById("koordináták").innerHTML = x_koordináta + ", " + y_koordináta;
+            document.getElementById("darabszám").innerHTML = i;
+        }
+        var körök = new Array();
+        var i = 0;
+        var szakaszok = new Array();
+
+
+        function nem_létezik_kör(l, x) {
+            var k = 0;
+            for (var j = 0; j < l; j++) {
+                if ((körök[j].getAttribute('cx') == x.pageX - rajzlap_balszél) && (körök[j].getAttribute('cy') == x.pageY - rajzlap_teteje)) {
+                    k++;
+                }
+            }
+            if (k == 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+
+
+        function kör_létrehozás(x) {
+
+            if (nem_létezik_kör(i, x)) {
+                var x_koordináta = x.pageX - rajzlap_balszél;
+                var y_koordináta = x.pageY - rajzlap_teteje;
+                körök[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                körök[i].setAttribute("cx", x_koordináta.toString());
+                körök[i].setAttribute("cy", y_koordináta.toString());
+                körök[i].setAttribute("r", 6);
+                körök[i].setAttribute('id', i.toString());
+
+                rajzlap.appendChild(körök[i]);
+
+                körök[i].onmouseover = m_over;
+                körök[i].onmousedown = m_down;
+
+                if (i % 2 == 1) {
+                    var w = (i - 1) / 2;
+                    szakaszok[w] = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                    szakaszok[w].setAttribute("x1", körök[i - 1].getAttribute('cx').toString());
+                    szakaszok[w].setAttribute("y1", körök[i - 1].getAttribute('cy').toString());
+                    szakaszok[w].setAttribute("x2", körök[i].getAttribute('cx').toString());
+                    szakaszok[w].setAttribute("y2", körök[i].getAttribute('cy').toString());
+                    szakaszok[w].setAttribute("stroke", "black");
+                    rajzlap.appendChild(szakaszok[w]);
+                }
+
+                i++;
+            }
+        }
+
+
+
+        var kapcsoló = 0;
+        var aktualis = 0; // ezt vezettem be
+
+        function m_over() {
+            event.target.setAttribute("fill", "#888");
+        }
+
+        function m_down() {
+            kapcsoló = 1;
+            event.target.setAttribute("fill", "#CCC");
+            aktualis = parseInt(event.target.getAttribute('id'));
+        }
+
+        function m_move(x) {
+            if (kapcsoló == 1) {
+                var x_koordináta = x.pageX - rajzlap_balszél;
+                var y_koordináta = x.pageY - rajzlap_teteje;
+                var target = document.getElementById(aktualis.toString());
+                target.setAttribute("cx", x_koordináta.toString());
+                target.setAttribute("cy", y_koordináta.toString());
+                target.setAttribute("fill", "#CCC");
+                var t = target.getAttribute('id');
+                t = parseInt(t);
+
+                if (t % 2 == 0) {
+                    var t_szakasz = t / 2;
+                    szakaszok[t_szakasz].setAttribute('x1', x_koordináta.toString());
+                    szakaszok[t_szakasz].setAttribute('y1', y_koordináta.toString());
+                }
+                else {
+                    var t_sz = (t - 1) / 2;
+                    szakaszok[t_sz].setAttribute('x2', x_koordináta.toString());
+                    szakaszok[t_sz].setAttribute('y2', y_koordináta.toString());
+                }
+            }
+        }
+
+        function m_out() {
+            event.target.setAttribute("fill", "#000");
+        }
+
+        function m_up() {
+            kapcsoló = 0;
+        }
+
+        window.addEventListener("mouseout", m_out);
+        window.addEventListener("mouseup", m_up);
+        window.addEventListener("mousemove", m_move);
+    </script>
+
+    <p>katt az egérrel a rajzlapra</p>
+    <p id="koordináták">az aktuális helyzet koordinátái</p>
+    <p id="darabszám">az eddig lehelyezett pontok száma</p>
+</body>
+
+</html>
