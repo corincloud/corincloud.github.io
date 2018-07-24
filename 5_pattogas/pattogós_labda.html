@@ -34,7 +34,7 @@
         var hosszúság = window.innerHeight;
         var rajzlap_teteje = hosszúság / 2 - 150;
         var rajzlap = document.getElementById("rajzlap");
-        rajzlap.onmouseup = klikkelés;
+        rajzlap.onmousedown = klikkelés;
 
         var körök = new Array();
         var i = 0;
@@ -50,8 +50,27 @@
             körök[i].setAttribute('id', i.toString());
 
             rajzlap.appendChild(körök[i]);
+            körök[i].onmouseup = leesés;
 
             i++;
+        }
+
+        var aktualis = 0;
+        function leesés() {
+            event.target.setAttribute("fill", "#CCC");
+            aktualis = parseInt(event.target.getAttribute('id'));
+            var target = document.getElementById(aktualis.toString());
+            var anonymus = function(){
+                kör_lefele(target);
+            };
+            var változó = setInterval(anonymus, 20);
+        }
+
+        function kör_lefele(t) {
+            var y = t.getAttribute('cy');
+            y = parseInt(y) + 1;
+            t.setAttribute("cy", y.toString());
+
         }
 
 
