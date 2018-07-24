@@ -50,34 +50,48 @@
             körök[i].setAttribute('id', i.toString());
 
             rajzlap.appendChild(körök[i]);
-            körök[i].onmouseup = leesés;
+            körök[i].onmouseup = mozgás;
+            irány_tömb[i] = 0;
 
             i++;
         }
 
         var aktualis = 0;
-        function leesés() {
+        function mozgás() {
             event.target.setAttribute("fill", "#CCC");
             aktualis = parseInt(event.target.getAttribute('id'));
             var target = document.getElementById(aktualis.toString());
-            var anonymus = function(){
-                kör_lefele(target);
+            var anonymus = function () {
+                kör_mozgás(target);
             };
             var változó = setInterval(anonymus, 20);
         }
 
-        function kör_lefele(t) {
+        var irány_tömb = new Array(); //0 lefele, 1 felfele
+        //irány_tömb[0] = 0;
+        //irány_tömb[1] = 0;
+        //irány_tömb[2] = 0;
+
+        function kör_mozgás(t) {
+            var s = parseInt(t.getAttribute('id'));
+            
             var y = t.getAttribute('cy');
-            y = parseInt(y) + 1;
+            y = parseInt(y);
+            if (irány_tömb[s] == 0) {
+                y = y + 1;
+                if (y == 295) {
+                    irány_tömb[s] = 1;
+                }
+            }
+            else {
+                y = y - 1;
+                if (y == 5) {
+                    irány_tömb[s] = 0;
+                }
+            }
             t.setAttribute("cy", y.toString());
 
         }
-
-        function also_szele() {
-            return false;
-        }
-
-
     </script>
 </body>
 
