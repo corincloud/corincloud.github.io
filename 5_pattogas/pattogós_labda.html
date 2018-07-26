@@ -36,7 +36,7 @@
         var rajzlap = document.getElementById("rajzlap");
         rajzlap.onmousedown = kör_létrehozás;
 
-        
+
 
         var korok_szama = 0;
         var sebessegek = [];
@@ -44,7 +44,7 @@
         var y_poziciok = [];
         var gyorsulasok = [];
 
-        
+
         function szimulacio_indito() {
             var aktualis_ido = Date.now();
             var szimulacio_differencia = (aktualis_ido - legutobbi_szimulacio) / 1000;
@@ -53,7 +53,7 @@
         }
 
         function szimulacio(ido_kulonbseg) {
-            for(var i = 0; i < korok_szama; i++) {
+            for (var i = 0; i < korok_szama; i++) {
                 var a = gyorsulasok[i];
                 var v0 = sebessegek[i];
                 var s0 = y_poziciok[i];
@@ -62,8 +62,29 @@
                 var s = 0.5 * a * t * t + v0 * t + s0;
                 var v = a * t + v0;
 
-                y_poziciok[i] = s;
-                sebessegek[i] = v;
+                if (s < pixel_to_meter(294)) {
+                    y_poziciok[i] = s;
+                    sebessegek[i] = v;
+                }
+                else {
+                    var t_1 = (Math.sqrt(v0 * v0 + 2 * a * (pixel_to_meter(294) - s0)) - v0) / a; //ütközésig eltelt idő
+                    var v_1 = v0 + a * t_1; // sebesség az ütközés pillanatában
+                    var t_2 = t - t_1;
+                    if (v_1 > 0.4) {
+                        v_1 = - v_1 * 0.8;
+                        v = a * t_2 + v_1;
+                        s = 0.5 * a * t_2 * t_2 + v_1 * t + pixel_to_meter(294);
+                        y_poziciok[i] = s;
+                        sebessegek[i] = v;
+                    }
+                    else { //meghalt
+                        y_poziciok[i] = pixel_to_meter(294);
+                        sebessegek[i] = 0;
+                        gyorsulasok[i] = 0;
+                        var target = document.getElementById("kor_" + i);
+                        target.setAttribute("fill", "red");
+                    }
+                }
 
                 kor_pozicio_frissites(i);
             }
@@ -87,7 +108,7 @@
         function kör_létrehozás(e) {
             var x_koordináta = e.pageX - rajzlap_balszél;
             var y_koordináta = e.pageY - rajzlap_teteje;
-            
+
             x_poziciok[korok_szama] = pixel_to_meter(x_koordináta);
             y_poziciok[korok_szama] = pixel_to_meter(y_koordináta);
             sebessegek[korok_szama] = 0;
@@ -99,7 +120,7 @@
             rajzlap.appendChild(kör);
 
             kor_pozicio_frissites(korok_szama);
-        
+
             korok_szama++;
         }
 
