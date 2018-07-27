@@ -25,6 +25,8 @@
     <svg id="rajzlap" viewBox="0 0 300 300">
     </svg>
     <script> 
+        var x_pozicio = 0;
+        var y_pozicio = 0;
         var körök_száma = 0;
         var szélesség = window.innerWidth;
         var rajzlap_balszél = szélesség / 2 - 150;
@@ -33,30 +35,65 @@
         var rajzlap = document.getElementById("rajzlap");
         rajzlap.onmousedown = kör_létrehozás;
         window.addEventListener("keydown", haladás);
+        window.addEventListener("keyup", megállás);
 
         function kör_létrehozás(e) {
             if (körök_száma < 1) {
                 var x_koordináta = e.pageX - rajzlap_balszél;
                 var y_koordináta = e.pageY - rajzlap_teteje;
+                x_pozicio = x_koordináta;
+                y_pozicio = y_koordináta;
 
                 var kör = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
                 kör.setAttribute("r", 6);
-                kör.setAttribute("cx", x_koordináta.toString());
-                kör.setAttribute("cy", y_koordináta.toString());
+                kör.setAttribute("cx", x_pozicio.toString());
+                kör.setAttribute("cy", y_pozicio.toString());
                 kör.setAttribute('id', "kor");
                 rajzlap.appendChild(kör);
                 körök_száma++;
             }
         }
-
+        
+        var kapcsoló = 0;
         function haladás(e) {
             if (e.key == "ArrowUp") {
-                var target = document.getElementById("kor");
-                var y_pozíció = target.getAttribute('cy');
-                y_pozíció -= 1;
-                target.setAttribute('cy', y_pozíció.toString());
+                kapcsoló = 1;
             }
         }
+
+        function megállás(e){
+            if (e.key == "ArrowUp") {
+                kapcsoló = 0;
+            }
+        }
+
+        function szimulacio_indito() {
+            var aktualis_ido = Date.now() / 1000;
+            var szimulacio_differencia = (aktualis_ido - legutobbi_szimulacio);
+            szimulacio(szimulacio_differencia);
+            legutobbi_szimulacio = aktualis_ido;
+        }
+
+        function szimulacio(ido_kulonbseg) {
+            if ((kapcsoló == 1) && (körök_száma == 1)) {
+                var v0 = -100; // pixel/secundum
+                var s0 = y_pozicio;
+                var t = ido_kulonbseg;
+
+                var s = s0 + v0 * t;
+                y_pozicio = s;
+
+                kor_pozicio_frissites();
+            }
+        }
+
+        function kor_pozicio_frissites() {
+            var kör = document.getElementById("kor");
+            kör.setAttribute("cy", y_pozicio.toString());
+        }
+        var legutobbi_szimulacio = Date.now() / 1000;
+        setInterval(szimulacio_indito, 10);
+
 
     </script>
 </body>

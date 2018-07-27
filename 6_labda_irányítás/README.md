@@ -1,2 +1,2 @@
-# Guruló labda
-A labda addig mozog amíg nyomjuk a felfele nyilat. A jobb és bal nyíllal kanyarodni lehet.
+# GurulÃ³ labda
+A labda addig mozog amÃ­g nyomjuk a felfele nyilat. A jobb Ã©s bal nyÃ­llal kanyarodni lehet.
