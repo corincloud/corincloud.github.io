@@ -34,8 +34,8 @@
         var rajzlap_teteje = hosszúság / 2 - 150;
         var rajzlap = document.getElementById("rajzlap");
         rajzlap.onmousedown = kör_létrehozás;
-        window.addEventListener("keydown", haladás);
-        window.addEventListener("keyup", megállás);
+        window.addEventListener("keydown", billentyű_lenyomás);
+        window.addEventListener("keyup", billentyű_felengedés);
 
         function kör_létrehozás(e) {
             if (körök_száma < 1) {
@@ -53,15 +53,24 @@
                 körök_száma++;
             }
         }
-        
+
         var kapcsoló = 0;
-        function haladás(e) {
-            if (e.key == "ArrowUp") {
-                kapcsoló = 1;
+        var irány = 0; // 0 felfele, 1 jobbra, 2 lefele, 3 balra
+        function billentyű_lenyomás(e) {
+            switch (e.key) {
+                case 'ArrowUp':
+                    kapcsoló = 1;
+                    break;
+                case 'ArrowRight':
+                    irány = (irány + 1) % 4;
+                    break;
+                case 'ArrowLeft':
+                    irány = (irány + 3) % 4;
+                    break;
             }
         }
 
-        function megállás(e){
+        function billentyű_felengedés(e) {
             if (e.key == "ArrowUp") {
                 kapcsoló = 0;
             }
@@ -75,20 +84,85 @@
         }
 
         function szimulacio(ido_kulonbseg) {
-            if ((kapcsoló == 1) && (körök_száma == 1)) {
-                var v0 = -100; // pixel/secundum
-                var s0 = y_pozicio;
-                var t = ido_kulonbseg;
 
-                var s = s0 + v0 * t;
-                y_pozicio = s;
+            if (körök_száma == 1) {
 
-                kor_pozicio_frissites();
+                switch (irány) {
+                    case 0:
+                        var kör = document.getElementById("kor");
+                        kör.setAttribute("fill", "black");
+                        if (kapcsoló == 1) {
+                            var v0 = 100; // pixel/secundum
+                            var s0 = y_pozicio;
+                            var t = ido_kulonbseg;
+
+                            var s = s0 - v0 * t;
+                            y_pozicio = s;
+
+                            kor_pozicio_frissites();
+                        }
+                        break;
+                    case 1:
+                        var kör = document.getElementById("kor");
+                        kör.setAttribute("fill", "red");
+                        if (kapcsoló == 1) {
+                            var v0 = 100; // pixel/secundum
+                            var s0 = x_pozicio;
+                            var t = ido_kulonbseg;
+
+                            var s = s0 + v0 * t;
+                            x_pozicio = s;
+
+                            kor_pozicio_frissites();
+                        }
+                        break;
+                    case 2:
+                        var kör = document.getElementById("kor");
+                        kör.setAttribute("fill", "blue");
+                        if (kapcsoló == 1) {
+                            var v0 = 100; // pixel/secundum
+                            var s0 = y_pozicio;
+                            var t = ido_kulonbseg;
+
+                            var s = s0 + v0 * t;
+                            y_pozicio = s;
+
+                            kor_pozicio_frissites();
+                        }
+                        break;
+                    case 3:
+                        var kör = document.getElementById("kor");
+                        kör.setAttribute("fill", "green");
+                        if (kapcsoló == 1) {
+                            var v0 = 100; // pixel/secundum
+                            var s0 = x_pozicio;
+                            var t = ido_kulonbseg;
+
+                            var s = s0 - v0 * t;
+                            x_pozicio = s;
+
+                            kor_pozicio_frissites();
+                        }
+                        break;
+                }
+
+
+                /*if (kapcsoló == 1) {
+                    var v0 = -100; // pixel/secundum
+                    var s0 = y_pozicio;
+                    var t = ido_kulonbseg;
+
+                    var s = s0 + v0 * t;
+                    y_pozicio = s;
+
+                    kor_pozicio_frissites();
+                }*/
             }
         }
 
         function kor_pozicio_frissites() {
             var kör = document.getElementById("kor");
+            kör.setAttribute("cx", x_pozicio.toString());
             kör.setAttribute("cy", y_pozicio.toString());
         }
         var legutobbi_szimulacio = Date.now() / 1000;
