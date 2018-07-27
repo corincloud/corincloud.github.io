@@ -32,6 +32,7 @@
         var rajzlap_teteje = hosszúság / 2 - 150;
         var rajzlap = document.getElementById("rajzlap");
         rajzlap.onmousedown = kör_létrehozás;
+        window.addEventListener("keydown", haladás);
 
         function kör_létrehozás(e) {
             if (körök_száma < 1) {
@@ -45,6 +46,15 @@
                 kör.setAttribute('id', "kor");
                 rajzlap.appendChild(kör);
                 körök_száma++;
+            }
+        }
+
+        function haladás(e) {
+            if (e.key == "ArrowUp") {
+                var target = document.getElementById("kor");
+                var y_pozíció = target.getAttribute('cy');
+                y_pozíció -= 1;
+                target.setAttribute('cy', y_pozíció.toString());
             }
         }
 
