@@ -1,0 +1,54 @@
+<html>
+
+<head>
+    <title>guruló_labda</title>
+    <style>
+        #rajzlap {
+            display: block;
+            border: 1px solid rgb(96, 212, 247);
+            width: 300px;
+            height: 300px;
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        body {
+            margin-top: 0%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <svg id="rajzlap" viewBox="0 0 300 300">
+    </svg>
+    <script> 
+        var körök_száma = 0;
+        var szélesség = window.innerWidth;
+        var rajzlap_balszél = szélesség / 2 - 150;
+        var hosszúság = window.innerHeight;
+        var rajzlap_teteje = hosszúság / 2 - 150;
+        var rajzlap = document.getElementById("rajzlap");
+        rajzlap.onmousedown = kör_létrehozás;
+
+        function kör_létrehozás(e) {
+            if (körök_száma < 1) {
+                var x_koordináta = e.pageX - rajzlap_balszél;
+                var y_koordináta = e.pageY - rajzlap_teteje;
+
+                var kör = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                kör.setAttribute("r", 6);
+                kör.setAttribute("cx", x_koordináta.toString());
+                kör.setAttribute("cy", y_koordináta.toString());
+                kör.setAttribute('id', "kor");
+                rajzlap.appendChild(kör);
+                körök_száma++;
+            }
+        }
+
+    </script>
+</body>
+
+</html>
