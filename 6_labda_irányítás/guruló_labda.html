@@ -90,7 +90,7 @@
         function szimulacio(ido_kulonbseg) {
 
             if ((körök_száma == 1) && (kapcsoló == 1)) {
-                var v0 = 50; //pixel/sec
+                var v0 = 80; //pixel/sec
                 var w = 180; //szögsebesség: fok/sec
                 w = w * irány_kapcsoló; //a forgatás irányát határozza meg
                 var s0_x = x_pozicio;
@@ -102,6 +102,13 @@
 
                 var v0_x = v0 * Math.cos(szög_radián);
                 var v0_y = v0 * Math.sin(szög_radián);
+
+                if ((s0_x + v0_x * t < 5) || (s0_x + v0_x * t > 295)) {
+                    v0_x = 0;
+                }
+                if ((s0_y + v0_y * t < 5) || (s0_y + v0_y * t > 295)) {
+                    v0_y = 0;
+                }
 
                 var s_x = s0_x + v0_x * t;
                 var s_y = s0_y + v0_y * t;
@@ -116,8 +123,12 @@
 
         function kor_pozicio_frissites() {
             var kör = document.getElementById("kor");
+            kör.setAttribute('fill', 'black');
             kör.setAttribute("cx", x_pozicio.toString());
             kör.setAttribute("cy", y_pozicio.toString());
+            if ((x_pozicio < 6) || (x_pozicio > 294) || (y_pozicio < 6) || (y_pozicio > 294)) {
+                kör.setAttribute('fill', 'red');
+            }
         }
         var legutobbi_szimulacio = Date.now() / 1000;
         setInterval(szimulacio_indito, 10);
