@@ -55,17 +55,18 @@
         }
 
         var kapcsoló = 0;
-        var irány = 0; // 0 felfele, 3 fokonként fordulunk: jobbnyíl neg, bal poz irányba
+        var irány_kapcsoló = 0;
+        var szög = 0;
         function billentyű_lenyomás(e) {
             switch (e.key) {
                 case 'ArrowUp':
                     kapcsoló = 1;
                     break;
                 case 'ArrowRight':
-                    irány = (irány + 1) % 120;
+                    irány_kapcsoló = 1;
                     break;
                 case 'ArrowLeft':
-                    irány = (irány + 119) % 120;
+                    irány_kapcsoló = -1;
                     break;
             }
         }
@@ -73,6 +74,9 @@
         function billentyű_felengedés(e) {
             if (e.key == "ArrowUp") {
                 kapcsoló = 0;
+            }
+            if ((e.key == 'ArrowRight') || (e.key == 'ArrowLeft')) {
+                irány_kapcsoló = 0;
             }
         }
 
@@ -87,14 +91,17 @@
 
             if ((körök_száma == 1) && (kapcsoló == 1)) {
                 var v0 = 50; //pixel/sec
+                var w = 180; //szögsebesség: fok/sec
+                w = w * irány_kapcsoló; //a forgatás irányát határozza meg
                 var s0_x = x_pozicio;
                 var s0_y = y_pozicio;
                 var t = ido_kulonbseg;
-                
-                var szög = (3 * irány * Math.PI) / 180; //ez átváltja radiánba
+                szög = szög + w * t;
 
-                var v0_x = v0 * Math.cos (szög);
-                var v0_y = v0 * Math.sin (szög);
+                szög_radián = (szög * Math.PI) / 180;
+
+                var v0_x = v0 * Math.cos(szög_radián);
+                var v0_y = v0 * Math.sin(szög_radián);
 
                 var s_x = s0_x + v0_x * t;
                 var s_y = s0_y + v0_y * t;
@@ -102,25 +109,10 @@
                 x_pozicio = s_x;
                 y_pozicio = s_y;
 
-
-
-
-                kor_pozicio_frissites();            
-            }
-
-
-            /*if (kapcsoló == 1) {
-                var v0 = -100; // pixel/secundum
-                var s0 = y_pozicio;
-                var t = ido_kulonbseg;
-
-                var s = s0 + v0 * t;
-                y_pozicio = s;
-
                 kor_pozicio_frissites();
-            }*/
+            }
         }
-        
+
 
         function kor_pozicio_frissites() {
             var kör = document.getElementById("kor");
