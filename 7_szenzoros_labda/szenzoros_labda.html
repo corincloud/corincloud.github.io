@@ -89,7 +89,17 @@
                 középső_pont.setAttribute('cy', 0);
                 középső_pont.setAttribute('id', 'középső');
 
-                
+                var jobb_pont = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                jobb_pont.setAttribute('r', 8);
+                jobb_pont.setAttribute('cx', 0);
+                jobb_pont.setAttribute('cy', 0);
+                jobb_pont.setAttribute('id', 'jobb');
+
+                var bal_pont = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                bal_pont.setAttribute('r', 8);
+                bal_pont.setAttribute('cx', 0);
+                bal_pont.setAttribute('cy', 0);
+                bal_pont.setAttribute('id', 'bal');
 
                 var csoport = document.createElementNS("http://www.w3.org/2000/svg", 'g');
                 csoport.appendChild(kör);
@@ -102,6 +112,8 @@
 
                 rajzlap.appendChild(csoport);
                 rajzlap.appendChild(középső_pont);
+                rajzlap.appendChild(jobb_pont);
+                rajzlap.appendChild(bal_pont);
 
                 van_e_lerakva_kör = true;
 
@@ -110,6 +122,9 @@
                 eltolás_x = x_koordináta;
                 eltolás_y = y_koordináta;
                 kacsacsor_pozicio_frissites();
+                középső_pont_frissites();
+                jobb_pont_frissites();
+                bal_pont_frissites();
             }
         }
 
@@ -152,7 +167,7 @@
                 var s0_x = eltolás_x;
                 var s0_y = eltolás_y;
                 var t = ido_kulonbseg;
-                szög = szög + w * t;
+                szög = (szög + w * t) % 360;
 
                 szög_radián = (szög * Math.PI) / 180;
 
@@ -174,6 +189,8 @@
 
                 kacsacsor_pozicio_frissites();
                 középső_pont_frissites();
+                jobb_pont_frissites();
+                bal_pont_frissites();
             }
         }
 
@@ -188,52 +205,75 @@
             }
         }
 
-        function középső_pont_frissites(){
-            var középső_pont = document.getElementById('középső');
-            szög += 360;
-            szög = szög % 360;
-            if((szög > 270) || (szög < 90)){
-                var helyzet = eltolás_y + (300 - eltolás_x) * Math.tan(szög_radián);
+        function pont_frissites(pont, Szög, Szög_radián){
+            if((Szög > 270) || (Szög < 90)){
+                var helyzet = eltolás_y + (300 - eltolás_x) * Math.tan(Szög_radián);
                 if(helyzet < 0){
-                    középső_pont.setAttribute('fill', 'red');
-                    var helyzet_1 = eltolás_x + eltolás_y / Math.tan(- szög_radián);
-                    középső_pont.setAttribute('cx', helyzet_1);
-                    középső_pont.setAttribute('cy', 0);
+                    pont.setAttribute('fill', 'red');
+                    var helyzet_1 = eltolás_x + eltolás_y / Math.tan(- Szög_radián);
+                    pont.setAttribute('cx', helyzet_1);
+                    pont.setAttribute('cy', 0);
                 }
                 if((helyzet > 0) && (helyzet < 300)){
-                    középső_pont.setAttribute('fill', 'green');
-                    középső_pont.setAttribute('cx', 300);
-                    középső_pont.setAttribute('cy', helyzet);
+                    pont.setAttribute('fill', 'green');
+                    pont.setAttribute('cx', 300);
+                    pont.setAttribute('cy', helyzet);
                 }
                 if(helyzet > 300){
-                    középső_pont.setAttribute('fill', 'yellow');
-                    var helyzet_2 = eltolás_x + (300 - eltolás_y) / Math.tan(szög_radián);
-                    középső_pont.setAttribute('cx', helyzet_2);
-                    középső_pont.setAttribute('cy', 300);
+                    pont.setAttribute('fill', 'yellow');
+                    var helyzet_2 = eltolás_x + (300 - eltolás_y) / Math.tan(Szög_radián);
+                    pont.setAttribute('cx', helyzet_2);
+                    pont.setAttribute('cy', 300);
                 }
             }
             else{
-                var hely = eltolás_y + eltolás_x * Math.tan(Math.PI - szög_radián);
+                var hely = eltolás_y + eltolás_x * Math.tan(Math.PI - Szög_radián);
                 if(hely < 0){
-                    középső_pont.setAttribute('fill', 'red');
-                    var hely_1 = eltolás_x + eltolás_y / Math.tan(- szög_radián);
-                    középső_pont.setAttribute('cx', hely_1);
-                    középső_pont.setAttribute('cy', 0);
+                    pont.setAttribute('fill', 'red');
+                    var hely_1 = eltolás_x + eltolás_y / Math.tan(- Szög_radián);
+                    pont.setAttribute('cx', hely_1);
+                    pont.setAttribute('cy', 0);
                 }
                 if((hely > 0) && (hely < 300)){
-                    középső_pont.setAttribute('fill', 'blue');
-                    középső_pont.setAttribute('cx', 0);
-                    középső_pont.setAttribute('cy', hely);
+                    pont.setAttribute('fill', 'blue');
+                    pont.setAttribute('cx', 0);
+                    pont.setAttribute('cy', hely);
                 }
                 if(hely > 300){
-                    középső_pont.setAttribute('fill', 'yellow');
-                    var hely_2 = eltolás_x + (300 - eltolás_y) / Math.tan(szög_radián);
-                    középső_pont.setAttribute('cx', hely_2);
-                    középső_pont.setAttribute('cy', 300);
+                    pont.setAttribute('fill', 'yellow');
+                    var hely_2 = eltolás_x + (300 - eltolás_y) / Math.tan(Szög_radián);
+                    pont.setAttribute('cx', hely_2);
+                    pont.setAttribute('cy', 300);
                 }
             }
         }
 
+        function középső_pont_frissites(){
+            var középső_pont = document.getElementById('középső');
+            szög += 360;
+            szög = szög % 360;
+            szög_radián = (szög * Math.PI) / 180;
+            pont_frissites(középső_pont, szög, szög_radián);       
+        }
+
+        function jobb_pont_frissites(){
+            var jobb_pont = document.getElementById('jobb');
+            var jobb_szög;
+            jobb_szög = szög + 360 + 45;
+            jobb_szög = jobb_szög % 360;
+            //console.log('jobb szög:', szög, jobb_szög);
+            var jobb_szög_radián = (jobb_szög * Math.PI) / 180;
+            pont_frissites(jobb_pont, jobb_szög, jobb_szög_radián);
+        }
+
+        function bal_pont_frissites(){
+            var bal_pont = document.getElementById('bal');
+            var bal_szög;
+            bal_szög = szög + 360 - 45;
+            bal_szög = bal_szög % 360;
+            var bal_szög_radián = (bal_szög * Math.PI) / 180;
+            pont_frissites(bal_pont, bal_szög, bal_szög_radián);
+        }
 
     </script>
 </body>
