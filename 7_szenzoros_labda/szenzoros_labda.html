@@ -1,0 +1,161 @@
+<html>
+
+<head>
+    <title>kacsacsőr</title>
+    <style>
+        #rajzlap {
+            display: block;
+            border: 1px solid rgb(96, 212, 247);
+            width: 300px;
+            height: 300px;
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        body {
+            margin-top: 0%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <svg id="rajzlap" viewBox="0 0 300 300">
+    </svg>
+    <script> 
+        var szélesség = window.innerWidth;
+        var rajzlap_balszél = szélesség / 2 - 150;
+        var hosszúság = window.innerHeight;
+        var rajzlap_teteje = hosszúság / 2 - 150;
+        var rajzlap = document.getElementById("rajzlap");
+
+        var szög = 0;
+        var eltolás_x = 0;
+        var eltolás_y = 0;
+
+        var van_e_lerakva_kör = 0;
+        var megy_e_előre = 0;
+        var irány_kapcsoló = 0;
+
+        rajzlap.onmousedown = kör_létrehozás;
+        window.addEventListener("keydown", billentyű_lenyomás);
+        window.addEventListener("keyup", billentyű_felengedés);
+
+        var legutobbi_szimulacio = Date.now() / 1000;
+        setInterval(szimulacio_indito, 10);
+
+        function kör_létrehozás(e) {
+            if (van_e_lerakva_kör == false) {
+                var kör = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                kör.setAttribute("r", 6);
+                kör.setAttribute("cx", 0);
+                kör.setAttribute("cy", 0);
+                kör.setAttribute('id', "kor");
+
+                var négyzet = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+                négyzet.setAttribute('width', 6);
+                négyzet.setAttribute('height', 6);
+                négyzet.setAttribute('x', -3);
+                négyzet.setAttribute('y', -3);
+                négyzet.setAttribute('transform', 'translate(5 0) rotate(45 0 0)');
+                négyzet.setAttribute('id', 'n');
+
+
+                var csoport = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+                csoport.appendChild(kör);
+                csoport.appendChild(négyzet);
+                csoport.setAttribute('id', 'csoport');
+                rajzlap.appendChild(csoport);
+                csoport.setAttribute('fill', 'blue');
+
+                van_e_lerakva_kör = true;
+
+                var x_koordináta = e.pageX - rajzlap_balszél;
+                var y_koordináta = e.pageY - rajzlap_teteje;
+                eltolás_x = x_koordináta;
+                eltolás_y = y_koordináta;
+                kacsacsor_pozicio_frissites();
+            }
+        }
+
+        function billentyű_lenyomás(e) {
+            switch (e.key) {
+                case 'ArrowUp':
+                    megy_e_előre = 1;
+                    break;
+                case 'ArrowRight':
+                    irány_kapcsoló = 1;
+                    break;
+                case 'ArrowLeft':
+                    irány_kapcsoló = -1;
+                    break;
+            }
+        }
+
+        function billentyű_felengedés(e) {
+            if (e.key == "ArrowUp") {
+                van_e_lerakva_kör = 0;
+            }
+            if ((e.key == 'ArrowRight') || (e.key == 'ArrowLeft')) {
+                irány_kapcsoló = 0;
+            }
+        }
+
+        function szimulacio_indito() {
+            var aktualis_ido = Date.now() / 1000;
+            var szimulacio_differencia = (aktualis_ido - legutobbi_szimulacio);
+            szimulacio(szimulacio_differencia);
+            legutobbi_szimulacio = aktualis_ido;
+        }
+
+        function szimulacio(ido_kulonbseg) {
+
+            if ((van_e_lerakva_kör == true) && (megy_e_előre == true)) {
+                var v0 = 80; //pixel/sec
+                var w = 180; //szögsebesség: fok/sec
+                w = w * irány_kapcsoló; //a forgatás irányát határozza meg
+                var s0_x = eltolás_x;
+                var s0_y = eltolás_y;
+                var t = ido_kulonbseg;
+                szög = szög + w * t;
+
+                szög_radián = (szög * Math.PI) / 180;
+
+                var v0_x = v0 * Math.cos(szög_radián);
+                var v0_y = v0 * Math.sin(szög_radián);
+
+                if ((s0_x + v0_x * t < 5) || (s0_x + v0_x * t > 295)) {
+                    v0_x = 0;
+                }
+                if ((s0_y + v0_y * t < 5) || (s0_y + v0_y * t > 295)) {
+                    v0_y = 0;
+                }
+
+                var s_x = s0_x + v0_x * t;
+                var s_y = s0_y + v0_y * t;
+
+                eltolás_x = s_x;
+                eltolás_y = s_y;
+
+                kacsacsor_pozicio_frissites();
+            }
+        }
+
+        function kacsacsor_pozicio_frissites() {
+            var csoport = document.getElementById("csoport");
+            csoport.setAttribute('fill', 'blue');
+            csoport.setAttribute('transform',
+                'translate(' + eltolás_x + ', ' + eltolás_y + ') ' +
+                'rotate(' + szög + ' 0 0)');
+            if ((eltolás_x < 6) || (eltolás_x > 294) || (eltolás_y < 6) || (eltolás_y > 294)) {
+                csoport.setAttribute('fill', 'red');
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
