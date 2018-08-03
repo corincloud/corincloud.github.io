@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>szenzoros_labda</title>
+    <title>szenzoros_robotok</title>
     <style>
         #rajzlap {
             display: block;
@@ -50,6 +50,9 @@
         var középső_pont = [];
         var jobb_pont = [];
         var bal_pont = [];
+        var középső_távolság = [];
+        var jobb_távolság = [];
+        var bal_távolság = [];
 
         rajzlap.onmousedown = robot_létrehozás;
         window.addEventListener("keydown", billentyű_lenyomás);
@@ -216,6 +219,7 @@
                 középső_pont_frissites(aktuális);
                 jobb_pont_frissites(aktuális);
                 bal_pont_frissites(aktuális);
+                szenzor_adatok_kiírása();
             }
         }
 
@@ -239,17 +243,20 @@
                     var helyzet_1 = eltolás_x[k] + eltolás_y[k] / Math.tan(- Szög_radián);
                     pont.setAttribute('cx', helyzet_1);
                     pont.setAttribute('cy', 0);
+                    return pitagoras( (eltolás_x[k] - helyzet_1), eltolás_y[k] );
                 }
                 if ((helyzet > 0) && (helyzet < 300)) {
                     pont.setAttribute('fill', 'green');
                     pont.setAttribute('cx', 300);
                     pont.setAttribute('cy', helyzet);
+                    return pitagoras( (eltolás_x[k] - 300), (eltolás_y[k] - helyzet) );
                 }
                 if (helyzet > 300) {
                     pont.setAttribute('fill', 'yellow');
                     var helyzet_2 = eltolás_x[k] + (300 - eltolás_y[k]) / Math.tan(Szög_radián);
                     pont.setAttribute('cx', helyzet_2);
                     pont.setAttribute('cy', 300);
+                    return pitagoras( (eltolás_x[k] - helyzet_2), (eltolás_y[k] - 300) );
                 }
             }
             else {
@@ -259,17 +266,20 @@
                     var hely_1 = eltolás_x[k] + eltolás_y[k] / Math.tan(- Szög_radián);
                     pont.setAttribute('cx', hely_1);
                     pont.setAttribute('cy', 0);
+                    return pitagoras( (eltolás_x[k] - hely_1), (eltolás_y[k]) );
                 }
                 if ((hely > 0) && (hely < 300)) {
                     pont.setAttribute('fill', 'blue');
                     pont.setAttribute('cx', 0);
                     pont.setAttribute('cy', hely);
+                    return pitagoras(eltolás_x[k], (eltolás_y[k] - hely) );
                 }
                 if (hely > 300) {
                     pont.setAttribute('fill', 'yellow');
                     var hely_2 = eltolás_x[k] + (300 - eltolás_y[k]) / Math.tan(Szög_radián);
                     pont.setAttribute('cx', hely_2);
                     pont.setAttribute('cy', 300);
+                    return pitagoras( (eltolás_x[k] - hely_2), (eltolás_y[k] - 300) );
                 }
             }
         }
@@ -280,6 +290,7 @@
             szög[i] = szög[i] % 360;
             szög_radián = (szög[i] * Math.PI) / 180;
             pont_frissites(középső_pont[i], szög[i], szög_radián, i);
+            középső_távolság[i] = pont_frissites(középső_pont[i], szög[i], szög_radián, i) - 6;
         }
 
         function jobb_pont_frissites(aktuális) {
@@ -289,6 +300,7 @@
             jobb_szög = jobb_szög % 360;
             var jobb_szög_radián = (jobb_szög * Math.PI) / 180;
             pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i);
+            //jobb_távolság[i] = pont_frissites(jobb_pont[i], szög[i], szög_radián, i) - 6;
         }
 
         function bal_pont_frissites(aktuális) {
@@ -298,9 +310,29 @@
             bal_szög = bal_szög % 360;
             var bal_szög_radián = (bal_szög * Math.PI) / 180;
             pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i);
+            //bal_távolság[i] = pont_frissites(bal_pont[i], szög[i], szög_radián, i) - 6;
         }
 
+        function szenzor_adatok_kiírása(){
+            var i = aktuális;
+            document.getElementById("robot_index").innerHTML = i;
+            document.getElementById("középső_szenzor_távolság").innerHTML = középső_távolság[i];
+            //document.getElementById("jobb_szenzor_távolság").innerHTML = jobb_távolság[i];
+            //document.getElementById("bal_szenzor_távolság").innerHTML = bal_távolság[i];
+        }
+
+        function pitagoras(a, b){
+            return Math.sqrt(a * a + b * b);
+        }
     </script>
+    <p>alább írjuk ki az aktuálisan mozgatott robot indexét:</p>
+    <p id="robot_index"></p>
+    <p>a középső szenzor által mért távolság:</p>
+    <p id="középső_szenzor_távolság"></p>
+    <p>a jobboldali szenzor által mért távolság:</p>
+    <p id="jobb_szenzor_távolság"></p>
+    <p>a baloldali szenzor által mért távolság:</p>
+    <p id="bal_szenzor_távolság"></p>
 </body>
 
 </html>
