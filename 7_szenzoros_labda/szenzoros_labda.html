@@ -31,100 +31,117 @@
         var rajzlap_teteje = hosszúság / 2 - 150;
         var rajzlap = document.getElementById("rajzlap");
 
-        var szög = 0;
-        var eltolás_x = 0;
-        var eltolás_y = 0;
+        var szög = [];
+        var w = [];
+        var eltolás_x = [];
+        var eltolás_y = [];
 
-        var van_e_lerakva_kör = 0;
+        var körök_száma = 0;
         var megy_e_előre = 0;
         var irány_kapcsoló = 0;
+        var aktuális = 0;
 
-        rajzlap.onmousedown = kör_létrehozás;
+        var robotok = [];
+        var körök = [];
+        var négyzetek = [];
+        var középső_szenzor = [];
+        var jobb_szenzor = [];
+        var bal_szenzor = [];
+        var középső_pont = [];
+        var jobb_pont = [];
+        var bal_pont = [];
+
+        rajzlap.onmousedown = robot_létrehozás;
         window.addEventListener("keydown", billentyű_lenyomás);
         window.addEventListener("keyup", billentyű_felengedés);
 
         var legutobbi_szimulacio = Date.now() / 1000;
         setInterval(szimulacio_indito, 10);
 
-        function kör_létrehozás(e) {
-            if (van_e_lerakva_kör == false) {
-                var kör = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-                kör.setAttribute("r", 6);
-                kör.setAttribute("cx", 0);
-                kör.setAttribute("cy", 0);
-                kör.setAttribute('id', "kor");
+        function robot_létrehozás(e) {
+            if (körök_száma < 10) {
+                var i = körök_száma;
+                aktuális = i;
 
-                var négyzet = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-                négyzet.setAttribute('width', 6);
-                négyzet.setAttribute('height', 6);
-                négyzet.setAttribute('x', -3);
-                négyzet.setAttribute('y', -3);
-                négyzet.setAttribute('transform', 'translate(5 0) rotate(45 0 0)');
-                négyzet.setAttribute('id', 'n');
+                körök[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                körök[i].setAttribute("r", 6);
+                körök[i].setAttribute("cx", 0);
+                körök[i].setAttribute("cy", 0);
+                körök[i].setAttribute('id', "kör" + i);
 
-                var középső_szenzor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                középső_szenzor.setAttribute('x1', 0);
-                középső_szenzor.setAttribute('y1', 0);
-                középső_szenzor.setAttribute('x2', 450);
-                középső_szenzor.setAttribute('y2', 0);
-                középső_szenzor.setAttribute('stroke', 'black');
+                négyzetek[i] = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+                négyzetek[i].setAttribute('width', 6);
+                négyzetek[i].setAttribute('height', 6);
+                négyzetek[i].setAttribute('x', -3);
+                négyzetek[i].setAttribute('y', -3);
+                négyzetek[i].setAttribute('transform', 'translate(5 0) rotate(45 0 0)');
+                négyzetek[i].setAttribute('id', 'négyzet' + i);
 
-                var jobb_szenzor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                jobb_szenzor.setAttribute('x1', 0);
-                jobb_szenzor.setAttribute('y1', 0);
-                jobb_szenzor.setAttribute('x2', 300);
-                jobb_szenzor.setAttribute('y2', 300);
-                jobb_szenzor.setAttribute('stroke', 'black');
+                középső_szenzor[i] = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                középső_szenzor[i].setAttribute('x1', 0);
+                középső_szenzor[i].setAttribute('y1', 0);
+                középső_szenzor[i].setAttribute('x2', 450);
+                középső_szenzor[i].setAttribute('y2', 0);
+                középső_szenzor[i].setAttribute('stroke', 'black');
 
-                var bal_szenzor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                bal_szenzor.setAttribute('x1', 0);
-                bal_szenzor.setAttribute('y1', 0);
-                bal_szenzor.setAttribute('x2', 300);
-                bal_szenzor.setAttribute('y2', -300);
-                bal_szenzor.setAttribute('stroke', 'black');
+                jobb_szenzor[i] = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                jobb_szenzor[i].setAttribute('x1', 0);
+                jobb_szenzor[i].setAttribute('y1', 0);
+                jobb_szenzor[i].setAttribute('x2', 300);
+                jobb_szenzor[i].setAttribute('y2', 300);
+                jobb_szenzor[i].setAttribute('stroke', 'black');
 
-                var középső_pont = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-                középső_pont.setAttribute('r', 8);
-                középső_pont.setAttribute('cx', 0);
-                középső_pont.setAttribute('cy', 0);
-                középső_pont.setAttribute('id', 'középső');
+                bal_szenzor[i] = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                bal_szenzor[i].setAttribute('x1', 0);
+                bal_szenzor[i].setAttribute('y1', 0);
+                bal_szenzor[i].setAttribute('x2', 300);
+                bal_szenzor[i].setAttribute('y2', -300);
+                bal_szenzor[i].setAttribute('stroke', 'black');
 
-                var jobb_pont = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-                jobb_pont.setAttribute('r', 8);
-                jobb_pont.setAttribute('cx', 0);
-                jobb_pont.setAttribute('cy', 0);
-                jobb_pont.setAttribute('id', 'jobb');
+                középső_pont[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                középső_pont[i].setAttribute('r', 3);
+                középső_pont[i].setAttribute('cx', 0);
+                középső_pont[i].setAttribute('cy', 0);
+                középső_pont[i].setAttribute('id', 'középső' + i);
 
-                var bal_pont = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-                bal_pont.setAttribute('r', 8);
-                bal_pont.setAttribute('cx', 0);
-                bal_pont.setAttribute('cy', 0);
-                bal_pont.setAttribute('id', 'bal');
+                jobb_pont[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                jobb_pont[i].setAttribute('r', 3);
+                jobb_pont[i].setAttribute('cx', 0);
+                jobb_pont[i].setAttribute('cy', 0);
+                jobb_pont[i].setAttribute('id', 'jobb' + i);
 
-                var csoport = document.createElementNS("http://www.w3.org/2000/svg", 'g');
-                csoport.appendChild(kör);
-                csoport.appendChild(négyzet);
-                csoport.appendChild(középső_szenzor);
-                csoport.appendChild(jobb_szenzor);
-                csoport.appendChild(bal_szenzor);
-                csoport.setAttribute('id', 'csoport');
-                csoport.setAttribute('fill', 'blue');
+                bal_pont[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                bal_pont[i].setAttribute('r', 3);
+                bal_pont[i].setAttribute('cx', 0);
+                bal_pont[i].setAttribute('cy', 0);
+                bal_pont[i].setAttribute('id', 'bal' + i);
 
-                rajzlap.appendChild(csoport);
-                rajzlap.appendChild(középső_pont);
-                rajzlap.appendChild(jobb_pont);
-                rajzlap.appendChild(bal_pont);
+                robotok[i] = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+                robotok[i].appendChild(körök[i]);
+                robotok[i].appendChild(négyzetek[i]);
+                robotok[i].appendChild(középső_szenzor[i]);
+                robotok[i].appendChild(jobb_szenzor[i]);
+                robotok[i].appendChild(bal_szenzor[i]);
+                robotok[i].setAttribute('id', 'robot' + i);
+                robotok[i].setAttribute('fill', 'rgb(' + (i * 20 + 50) + ', ' + (i * 20 + 50) + ', ' + (i * 20 + 50) + ')');
 
-                van_e_lerakva_kör = true;
+                rajzlap.appendChild(robotok[i]);
+                rajzlap.appendChild(középső_pont[i]);
+                rajzlap.appendChild(jobb_pont[i]);
+                rajzlap.appendChild(bal_pont[i]);
+
+                szög[i] = 0;
 
                 var x_koordináta = e.pageX - rajzlap_balszél;
                 var y_koordináta = e.pageY - rajzlap_teteje;
-                eltolás_x = x_koordináta;
-                eltolás_y = y_koordináta;
-                kacsacsor_pozicio_frissites();
+                eltolás_x[i] = x_koordináta;
+                eltolás_y[i] = y_koordináta;
+                robot_pozicio_frissites();
                 középső_pont_frissites();
                 jobb_pont_frissites();
                 bal_pont_frissites();
+
+                körök_száma++;
             }
         }
 
@@ -139,6 +156,11 @@
                 case 'ArrowLeft':
                     irány_kapcsoló = -1;
                     break;
+            }
+            for (var i = 0; i <= 9; i++) {
+                if (e.key == i.toString()) {
+                    aktuális = i;
+                }
             }
         }
 
@@ -160,18 +182,19 @@
 
         function szimulacio(ido_kulonbseg) {
 
-            if (van_e_lerakva_kör == true) {
+            if (körök_száma > 0) {
                 var t = ido_kulonbseg;
-                var w = 180; //szögsebesség: fok/sec
-                w = w * irány_kapcsoló; //a forgatás irányát határozza meg
-                szög = (szög + w * t) % 360;
+                var i = aktuális;
+                w[i] = 180;
+                w[i] = w[i] * irány_kapcsoló; //a forgatás irányát határozza meg
+                szög[i] = (szög[i] + w[i] * t) % 360;
 
                 if (megy_e_előre == true) {
-                    var v0 = 40; //pixel/sec
-                    var s0_x = eltolás_x;
-                    var s0_y = eltolás_y;
-                    
-                    szög_radián = (szög * Math.PI) / 180;
+                    var v0 = 80; //pixel/sec
+                    var s0_x = eltolás_x[i];
+                    var s0_y = eltolás_y[i];
+
+                    var szög_radián = (szög[i] * Math.PI) / 180;
                     var v0_x = v0 * Math.cos(szög_radián);
                     var v0_y = v0 * Math.sin(szög_radián);
 
@@ -185,34 +208,35 @@
                     var s_x = s0_x + v0_x * t;
                     var s_y = s0_y + v0_y * t;
 
-                    eltolás_x = s_x;
-                    eltolás_y = s_y;
+                    eltolás_x[i] = s_x;
+                    eltolás_y[i] = s_y;
                 }
 
-                kacsacsor_pozicio_frissites();
-                középső_pont_frissites();
-                jobb_pont_frissites();
-                bal_pont_frissites();
+                robot_pozicio_frissites();
+                középső_pont_frissites(aktuális);
+                jobb_pont_frissites(aktuális);
+                bal_pont_frissites(aktuális);
             }
         }
 
-        function kacsacsor_pozicio_frissites() {
-            var csoport = document.getElementById("csoport");
-            csoport.setAttribute('fill', 'blue');
-            csoport.setAttribute('transform',
-                'translate(' + eltolás_x + ', ' + eltolás_y + ') ' +
-                'rotate(' + szög + ' 0 0)');
-            if ((eltolás_x < 6) || (eltolás_x > 294) || (eltolás_y < 6) || (eltolás_y > 294)) {
-                csoport.setAttribute('fill', 'red');
+        function robot_pozicio_frissites() {
+            var i = aktuális;
+            var robot = document.getElementById('robot' + i);
+            robot.setAttribute('fill', 'rgb(' + (i * 20 + 50) + ', ' + (i * 20 + 50) + ', ' + (i * 20 + 50) + ')');
+            robot.setAttribute('transform',
+                'translate(' + eltolás_x[i] + ', ' + eltolás_y[i] + ') ' +
+                'rotate(' + szög[i] + ' 0 0)');
+            if ((eltolás_x[i] < 6) || (eltolás_x[i] > 294) || (eltolás_y[i] < 6) || (eltolás_y[i] > 294)) {
+                robot.setAttribute('fill', 'red');
             }
         }
 
-        function pont_frissites(pont, Szög, Szög_radián) {
+        function pont_frissites(pont, Szög, Szög_radián, k) {
             if ((Szög > 270) || (Szög < 90)) {
-                var helyzet = eltolás_y + (300 - eltolás_x) * Math.tan(Szög_radián);
+                var helyzet = eltolás_y[k] + (300 - eltolás_x[k]) * Math.tan(Szög_radián);
                 if (helyzet < 0) {
                     pont.setAttribute('fill', 'red');
-                    var helyzet_1 = eltolás_x + eltolás_y / Math.tan(- Szög_radián);
+                    var helyzet_1 = eltolás_x[k] + eltolás_y[k] / Math.tan(- Szög_radián);
                     pont.setAttribute('cx', helyzet_1);
                     pont.setAttribute('cy', 0);
                 }
@@ -223,16 +247,16 @@
                 }
                 if (helyzet > 300) {
                     pont.setAttribute('fill', 'yellow');
-                    var helyzet_2 = eltolás_x + (300 - eltolás_y) / Math.tan(Szög_radián);
+                    var helyzet_2 = eltolás_x[k] + (300 - eltolás_y[k]) / Math.tan(Szög_radián);
                     pont.setAttribute('cx', helyzet_2);
                     pont.setAttribute('cy', 300);
                 }
             }
             else {
-                var hely = eltolás_y + eltolás_x * Math.tan(Math.PI - Szög_radián);
+                var hely = eltolás_y[k] + eltolás_x[k] * Math.tan(Math.PI - Szög_radián);
                 if (hely < 0) {
                     pont.setAttribute('fill', 'red');
-                    var hely_1 = eltolás_x + eltolás_y / Math.tan(- Szög_radián);
+                    var hely_1 = eltolás_x[k] + eltolás_y[k] / Math.tan(- Szög_radián);
                     pont.setAttribute('cx', hely_1);
                     pont.setAttribute('cy', 0);
                 }
@@ -243,38 +267,37 @@
                 }
                 if (hely > 300) {
                     pont.setAttribute('fill', 'yellow');
-                    var hely_2 = eltolás_x + (300 - eltolás_y) / Math.tan(Szög_radián);
+                    var hely_2 = eltolás_x[k] + (300 - eltolás_y[k]) / Math.tan(Szög_radián);
                     pont.setAttribute('cx', hely_2);
                     pont.setAttribute('cy', 300);
                 }
             }
         }
 
-        function középső_pont_frissites() {
-            var középső_pont = document.getElementById('középső');
-            szög += 360;
-            szög = szög % 360;
-            szög_radián = (szög * Math.PI) / 180;
-            pont_frissites(középső_pont, szög, szög_radián);
+        function középső_pont_frissites(aktuális) {
+            var i = aktuális;
+            szög[i] += 360;
+            szög[i] = szög[i] % 360;
+            szög_radián = (szög[i] * Math.PI) / 180;
+            pont_frissites(középső_pont[i], szög[i], szög_radián, i);
         }
 
-        function jobb_pont_frissites() {
-            var jobb_pont = document.getElementById('jobb');
+        function jobb_pont_frissites(aktuális) {
+            var i = aktuális;
             var jobb_szög;
-            jobb_szög = szög + 360 + 45;
+            jobb_szög = szög[i] + 360 + 45;
             jobb_szög = jobb_szög % 360;
-            //console.log('jobb szög:', szög, jobb_szög);
             var jobb_szög_radián = (jobb_szög * Math.PI) / 180;
-            pont_frissites(jobb_pont, jobb_szög, jobb_szög_radián);
+            pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i);
         }
 
-        function bal_pont_frissites() {
-            var bal_pont = document.getElementById('bal');
+        function bal_pont_frissites(aktuális) {
+            var i = aktuális;
             var bal_szög;
-            bal_szög = szög + 360 - 45;
+            bal_szög = szög[i] + 360 - 45;
             bal_szög = bal_szög % 360;
             var bal_szög_radián = (bal_szög * Math.PI) / 180;
-            pont_frissites(bal_pont, bal_szög, bal_szög_radián);
+            pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i);
         }
 
     </script>
