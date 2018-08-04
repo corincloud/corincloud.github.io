@@ -96,7 +96,7 @@
                 szakasz.setAttribute('y1', y1);
                 szakasz.setAttribute('x2', x2);
                 szakasz.setAttribute('y2', y2);
-                szakasz.setAttribute('stroke', 'black');
+                szakasz.setAttribute('stroke', 'red');
                 rajzlap.appendChild(szakasz);
 
                 van_e_már_szakasz = true;            
@@ -127,21 +127,21 @@
                 középső_szenzor[i].setAttribute('y1', 0);
                 középső_szenzor[i].setAttribute('x2', 450);
                 középső_szenzor[i].setAttribute('y2', 0);
-                középső_szenzor[i].setAttribute('stroke', 'black');
+                középső_szenzor[i].setAttribute('stroke', 'lightgray');
 
                 jobb_szenzor[i] = document.createElementNS("http://www.w3.org/2000/svg", 'line');
                 jobb_szenzor[i].setAttribute('x1', 0);
                 jobb_szenzor[i].setAttribute('y1', 0);
                 jobb_szenzor[i].setAttribute('x2', 300);
                 jobb_szenzor[i].setAttribute('y2', 300);
-                jobb_szenzor[i].setAttribute('stroke', 'black');
+                jobb_szenzor[i].setAttribute('stroke', 'lightgray');
 
                 bal_szenzor[i] = document.createElementNS("http://www.w3.org/2000/svg", 'line');
                 bal_szenzor[i].setAttribute('x1', 0);
                 bal_szenzor[i].setAttribute('y1', 0);
                 bal_szenzor[i].setAttribute('x2', 300);
                 bal_szenzor[i].setAttribute('y2', -300);
-                bal_szenzor[i].setAttribute('stroke', 'black');
+                bal_szenzor[i].setAttribute('stroke', 'lightgray');
 
                 középső_pont[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
                 középső_pont[i].setAttribute('r', 3);
@@ -281,20 +281,20 @@
             if ((Szög > 270) || (Szög < 90)) {
                 var helyzet = eltolás_y[k] + (300 - eltolás_x[k]) * Math.tan(Szög_radián);
                 if (helyzet < 0) {
-                    pont.setAttribute('fill', 'red');
+                    pont.setAttribute('fill', 'gray');
                     var helyzet_1 = eltolás_x[k] + eltolás_y[k] / Math.tan(- Szög_radián);
                     pont.setAttribute('cx', helyzet_1);
                     pont.setAttribute('cy', 0);
                     return pitagoras((eltolás_x[k] - helyzet_1), eltolás_y[k]);
                 }
                 if ((helyzet > 0) && (helyzet < 300)) {
-                    pont.setAttribute('fill', 'green');
+                    pont.setAttribute('fill', 'gray');
                     pont.setAttribute('cx', 300);
                     pont.setAttribute('cy', helyzet);
                     return pitagoras((eltolás_x[k] - 300), (eltolás_y[k] - helyzet));
                 }
                 if (helyzet > 300) {
-                    pont.setAttribute('fill', 'yellow');
+                    pont.setAttribute('fill', 'gray');
                     var helyzet_2 = eltolás_x[k] + (300 - eltolás_y[k]) / Math.tan(Szög_radián);
                     pont.setAttribute('cx', helyzet_2);
                     pont.setAttribute('cy', 300);
@@ -304,20 +304,20 @@
             else {
                 var hely = eltolás_y[k] + eltolás_x[k] * Math.tan(Math.PI - Szög_radián);
                 if (hely < 0) {
-                    pont.setAttribute('fill', 'red');
+                    pont.setAttribute('fill', 'gray');
                     var hely_1 = eltolás_x[k] + eltolás_y[k] / Math.tan(- Szög_radián);
                     pont.setAttribute('cx', hely_1);
                     pont.setAttribute('cy', 0);
                     return pitagoras((eltolás_x[k] - hely_1), (eltolás_y[k]));
                 }
                 if ((hely > 0) && (hely < 300)) {
-                    pont.setAttribute('fill', 'blue');
+                    pont.setAttribute('fill', 'gray');
                     pont.setAttribute('cx', 0);
                     pont.setAttribute('cy', hely);
                     return pitagoras(eltolás_x[k], (eltolás_y[k] - hely));
                 }
                 if (hely > 300) {
-                    pont.setAttribute('fill', 'yellow');
+                    pont.setAttribute('fill', 'gray');
                     var hely_2 = eltolás_x[k] + (300 - eltolás_y[k]) / Math.tan(Szög_radián);
                     pont.setAttribute('cx', hely_2);
                     pont.setAttribute('cy', 300);
