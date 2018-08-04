@@ -289,7 +289,7 @@
             szög[i] += 360;
             szög[i] = szög[i] % 360;
             szög_radián = (szög[i] * Math.PI) / 180;
-            pont_frissites(középső_pont[i], szög[i], szög_radián, i);
+            //pont_frissites(középső_pont[i], szög[i], szög_radián, i);
             középső_távolság[i] = pont_frissites(középső_pont[i], szög[i], szög_radián, i) - 6;
         }
 
@@ -299,8 +299,8 @@
             jobb_szög = szög[i] + 360 + 45;
             jobb_szög = jobb_szög % 360;
             var jobb_szög_radián = (jobb_szög * Math.PI) / 180;
-            pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i);
-            //jobb_távolság[i] = pont_frissites(jobb_pont[i], szög[i], szög_radián, i) - 6;
+            //pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i);
+            jobb_távolság[i] = pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i) - 6;
         }
 
         function bal_pont_frissites(aktuális) {
@@ -309,16 +309,16 @@
             bal_szög = szög[i] + 360 - 45;
             bal_szög = bal_szög % 360;
             var bal_szög_radián = (bal_szög * Math.PI) / 180;
-            pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i);
-            //bal_távolság[i] = pont_frissites(bal_pont[i], szög[i], szög_radián, i) - 6;
+            //pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i);
+            bal_távolság[i] = pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i) - 6;
         }
 
         function szenzor_adatok_kiírása(){
             var i = aktuális;
             document.getElementById("robot_index").innerHTML = i;
             document.getElementById("középső_szenzor_távolság").innerHTML = középső_távolság[i];
-            //document.getElementById("jobb_szenzor_távolság").innerHTML = jobb_távolság[i];
-            //document.getElementById("bal_szenzor_távolság").innerHTML = bal_távolság[i];
+            document.getElementById("jobb_szenzor_távolság").innerHTML = jobb_távolság[i];
+            document.getElementById("bal_szenzor_távolság").innerHTML = bal_távolság[i];
         }
 
         function pitagoras(a, b){
