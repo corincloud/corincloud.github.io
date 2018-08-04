@@ -55,9 +55,10 @@
         var középső_távolság = [];
         var jobb_távolság = [];
         var bal_távolság = [];
-        var szakasz_pont = [];
+        var x = [];
+        var y = [];
 
-        rajzlap.onmousedown = klikkelés;
+        rajzlap.addEventListener("mousedown", klikkelés);
         window.addEventListener("keydown", billentyű_lenyomás);
         window.addEventListener("keyup", billentyű_felengedés);
 
@@ -72,34 +73,31 @@
         }
 
         function szakasz_létrehozás(e) {
-            if(pont_számláló < 2){
-            var x_koordináta = e.pageX - rajzlap_balszél;
-            var y_koordináta = e.pageY - rajzlap_teteje;
-            var i = pont_számláló;
+            if (pont_számláló < 2) {
+                var x_koordináta = e.pageX - rajzlap_balszél;
+                var y_koordináta = e.pageY - rajzlap_teteje;
 
-            szakasz_pont[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-            szakasz_pont[i].setAttribute('r', 2);
-            szakasz_pont[i].setAttribute('cx', x_koordináta);
-            szakasz_pont[i].setAttribute('cy', y_koordináta);
-            rajzlap.appendChild(szakasz_pont[i]);
+                pont = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                pont.setAttribute('r', 2);
+                pont.setAttribute('cx', x_koordináta);
+                pont.setAttribute('cy', y_koordináta);
+                rajzlap.appendChild(pont);
 
-            pont_számláló++;
+                x[pont_számláló] = x_koordináta;
+                y[pont_számláló] = y_koordináta;
+
+                pont_számláló++;
             }
-            if(pont_számláló == 2){
-                var x1 = szakasz_pont[0].getAttribute('cx');
-                var y1 = szakasz_pont[0].getAttribute('cy');
-                var x2 = szakasz_pont[1].getAttribute('cx');
-                var y2 = szakasz_pont[1].getAttribute('cy');
-
+            if (pont_számláló == 2) {
                 var szakasz = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                szakasz.setAttribute('x1', x1);
-                szakasz.setAttribute('y1', y1);
-                szakasz.setAttribute('x2', x2);
-                szakasz.setAttribute('y2', y2);
+                szakasz.setAttribute('x1', x[0]);
+                szakasz.setAttribute('y1', y[0]);
+                szakasz.setAttribute('x2', x[1]);
+                szakasz.setAttribute('y2', y[1]);
                 szakasz.setAttribute('stroke', 'red');
                 rajzlap.appendChild(szakasz);
 
-                van_e_már_szakasz = true;            
+                van_e_már_szakasz = true;
             }
         }
 
