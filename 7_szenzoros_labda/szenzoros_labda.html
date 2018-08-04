@@ -40,6 +40,8 @@
         var megy_e_előre = 0;
         var irány_kapcsoló = 0;
         var aktuális = 0;
+        var van_e_már_szakasz = false;
+        var pont_számláló = 0;
 
         var robotok = [];
         var körök = [];
@@ -53,13 +55,53 @@
         var középső_távolság = [];
         var jobb_távolság = [];
         var bal_távolság = [];
+        var szakasz_pont = [];
 
-        rajzlap.onmousedown = robot_létrehozás;
+        rajzlap.onmousedown = klikkelés;
         window.addEventListener("keydown", billentyű_lenyomás);
         window.addEventListener("keyup", billentyű_felengedés);
 
         var legutobbi_szimulacio = Date.now() / 1000;
         setInterval(szimulacio_indito, 10);
+
+        function klikkelés(e) {
+            if (van_e_már_szakasz) {
+                robot_létrehozás(e);
+            }
+            szakasz_létrehozás(e);
+        }
+
+        function szakasz_létrehozás(e) {
+            if(pont_számláló < 2){
+            var x_koordináta = e.pageX - rajzlap_balszél;
+            var y_koordináta = e.pageY - rajzlap_teteje;
+            var i = pont_számláló;
+
+            szakasz_pont[i] = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            szakasz_pont[i].setAttribute('r', 2);
+            szakasz_pont[i].setAttribute('cx', x_koordináta);
+            szakasz_pont[i].setAttribute('cy', y_koordináta);
+            rajzlap.appendChild(szakasz_pont[i]);
+
+            pont_számláló++;
+            }
+            if(pont_számláló == 2){
+                var x1 = szakasz_pont[0].getAttribute('cx');
+                var y1 = szakasz_pont[0].getAttribute('cy');
+                var x2 = szakasz_pont[1].getAttribute('cx');
+                var y2 = szakasz_pont[1].getAttribute('cy');
+
+                var szakasz = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                szakasz.setAttribute('x1', x1);
+                szakasz.setAttribute('y1', y1);
+                szakasz.setAttribute('x2', x2);
+                szakasz.setAttribute('y2', y2);
+                szakasz.setAttribute('stroke', 'black');
+                rajzlap.appendChild(szakasz);
+
+                van_e_már_szakasz = true;            
+            }
+        }
 
         function robot_létrehozás(e) {
             if (körök_száma < 10) {
@@ -243,20 +285,20 @@
                     var helyzet_1 = eltolás_x[k] + eltolás_y[k] / Math.tan(- Szög_radián);
                     pont.setAttribute('cx', helyzet_1);
                     pont.setAttribute('cy', 0);
-                    return pitagoras( (eltolás_x[k] - helyzet_1), eltolás_y[k] );
+                    return pitagoras((eltolás_x[k] - helyzet_1), eltolás_y[k]);
                 }
                 if ((helyzet > 0) && (helyzet < 300)) {
                     pont.setAttribute('fill', 'green');
                     pont.setAttribute('cx', 300);
                     pont.setAttribute('cy', helyzet);
-                    return pitagoras( (eltolás_x[k] - 300), (eltolás_y[k] - helyzet) );
+                    return pitagoras((eltolás_x[k] - 300), (eltolás_y[k] - helyzet));
                 }
                 if (helyzet > 300) {
                     pont.setAttribute('fill', 'yellow');
                     var helyzet_2 = eltolás_x[k] + (300 - eltolás_y[k]) / Math.tan(Szög_radián);
                     pont.setAttribute('cx', helyzet_2);
                     pont.setAttribute('cy', 300);
-                    return pitagoras( (eltolás_x[k] - helyzet_2), (eltolás_y[k] - 300) );
+                    return pitagoras((eltolás_x[k] - helyzet_2), (eltolás_y[k] - 300));
                 }
             }
             else {
@@ -266,20 +308,20 @@
                     var hely_1 = eltolás_x[k] + eltolás_y[k] / Math.tan(- Szög_radián);
                     pont.setAttribute('cx', hely_1);
                     pont.setAttribute('cy', 0);
-                    return pitagoras( (eltolás_x[k] - hely_1), (eltolás_y[k]) );
+                    return pitagoras((eltolás_x[k] - hely_1), (eltolás_y[k]));
                 }
                 if ((hely > 0) && (hely < 300)) {
                     pont.setAttribute('fill', 'blue');
                     pont.setAttribute('cx', 0);
                     pont.setAttribute('cy', hely);
-                    return pitagoras(eltolás_x[k], (eltolás_y[k] - hely) );
+                    return pitagoras(eltolás_x[k], (eltolás_y[k] - hely));
                 }
                 if (hely > 300) {
                     pont.setAttribute('fill', 'yellow');
                     var hely_2 = eltolás_x[k] + (300 - eltolás_y[k]) / Math.tan(Szög_radián);
                     pont.setAttribute('cx', hely_2);
                     pont.setAttribute('cy', 300);
-                    return pitagoras( (eltolás_x[k] - hely_2), (eltolás_y[k] - 300) );
+                    return pitagoras((eltolás_x[k] - hely_2), (eltolás_y[k] - 300));
                 }
             }
         }
@@ -313,7 +355,7 @@
             bal_távolság[i] = pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i) - 6;
         }
 
-        function szenzor_adatok_kiírása(){
+        function szenzor_adatok_kiírása() {
             var i = aktuális;
             document.getElementById("robot_index").innerHTML = i;
             document.getElementById("középső_szenzor_távolság").innerHTML = középső_távolság[i];
@@ -321,7 +363,7 @@
             document.getElementById("bal_szenzor_távolság").innerHTML = bal_távolság[i];
         }
 
-        function pitagoras(a, b){
+        function pitagoras(a, b) {
             return Math.sqrt(a * a + b * b);
         }
     </script>
