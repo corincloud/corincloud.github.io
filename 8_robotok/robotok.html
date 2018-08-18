@@ -57,8 +57,11 @@
         var bal_távolság = [];
         var x = [];
         var y = [];
+        var Pont = [];
+        var szakasz_0;
+        var c0;
 
-        /*class Pont2D {
+        class Pont2D {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
@@ -70,7 +73,7 @@
                 return Math.sqrt(x_diff * x_diff + y_diff * y_diff);
             }
 
-            forgat(szög) {
+            /*forgat(szög) {
                 // FIGYELEM, ezt meg kell írni
             }
 
@@ -82,14 +85,14 @@
                 if(this.x < elsőKoordináta.x) {
                     this.x = elsőKoordináta.x;
                 }
-            }
+            }*/
 
         }
 
-        let elso_pont2D = new Pont2D(0, 0);
-        let masodik_pont2D = new Pont2D(1, 1);
+        //let elso_pont2D = new Pont2D(0, 0);
+        //let masodik_pont2D = new Pont2D(1, 1);
 
-        alert("A távolság = " + elso_pont2D.tavolsag(masodik_pont2D));
+        //alert("A távolság = " + elso_pont2D.tavolsag(masodik_pont2D));
 
         class Szakasz2D {
             constructor(elsoPont, masodikPont) {
@@ -97,13 +100,68 @@
                 this.masikPont = masodikPont;
             }
 
-            szakaszMetszéspont(másikSzakasz) {
+            /*szakaszMetszéspont(másikSzakasz) {
                 // itt igazából ki kéne számolni
                 return new Pont2D(1, 2);
+            }*/
+        }
+
+        class Egyenes2D {
+            constructor(kezdőPont, irány) {
+                this.x0 = kezdőPont.x;
+                this.y0 = kezdőPont.y;
+                this.cosa = Math.cos((irány * Math.PI) / 180);
+                this.sina = Math.sin((irány * Math.PI) / 180);
             }
         }
 
-        class Robot {
+        function szakaszból_egyenes(Szakasz) {
+            let cosa = Szakasz.masikPont.x - Szakasz.elsoPont.x;
+            let sina = Szakasz.masikPont.y - Szakasz.elsoPont.y;
+            let irány = Math.atan(sina / cosa) * 180 / Math.PI;
+            return new Egyenes2D(Szakasz.elsoPont, irány);
+        }
+
+        function szakasz_rendezés(Szakasz) {
+            if (Szakasz.elsoPont.x > Szakasz.masikPont.x) {
+                let a = Szakasz.masikPont.x;
+                Szakasz.masikPont.x = Szakasz.elsoPont.x;
+                Szakasz.elsoPont.x = a;
+                let b = Szakasz.masikPont.y;
+                Szakasz.masikPont.y = Szakasz.elsoPont.y;
+                Szakasz.elsoPont.y = b;
+            }
+            return Szakasz;
+        }
+
+        function két_egyenes_metszéspontja(elsőEgyenes, másodikEgyenes) {
+            let X0 = elsőEgyenes.x0;
+            let Y0 = elsőEgyenes.y0;
+            let COSA = elsőEgyenes.cosa;
+            let SINA = elsőEgyenes.sina;
+            let X1 = másodikEgyenes.x0;
+            let Y1 = másodikEgyenes.y0;
+            let COSB = másodikEgyenes.cosa;
+            let SINB = másodikEgyenes.sina;
+            let C0;
+            C0 = (SINB * (X1 - X0) + COSB * (Y0 - Y1)) / (COSA * SINB - SINA * COSB);
+            c0 = C0;
+            return new Pont2D(X0 + C0 * COSA, Y0 + C0 * SINA);
+        }
+
+        var q = new Pont2D(10, 10);
+        var r = new Pont2D(32, 32);
+        var q_1 = new Pont2D(200, 20);
+        var r_1 = new Pont2D(200, 220);
+        var szaki = new Szakasz2D(r, q);
+        szaki = szakasz_rendezés(szaki);
+        var szaki_1 = new Szakasz2D(r_1, q_1);
+        var egyi = szakaszból_egyenes(szaki);
+        var egyi_1 = szakaszból_egyenes(szaki_1);
+        var pont = két_egyenes_metszéspontja(egyi, egyi_1);
+        alert(pont.x);
+        alert(pont.y);
+        /*class Robot {
             constructor(kezdőpont, kezdőszög) {
                 this.kezdőpont = kezdőpont;
                 this.kezdőszög = kezdőszög;
@@ -154,6 +212,8 @@
                 x[pont_számláló] = x_koordináta;
                 y[pont_számláló] = y_koordináta;
 
+                Pont[pont_számláló] = new Pont2D(x_koordináta, y_koordináta);
+
                 pont_számláló++;
             }
             if (pont_számláló == 2) {
@@ -166,6 +226,8 @@
                 rajzlap.appendChild(szakasz);
 
                 van_e_már_szakasz = true;
+                szakasz_0 = new Szakasz2D(Pont[0], Pont[1]);
+                szakasz_0 = szakasz_rendezés(szakasz_0);
             }
         }
 
@@ -231,8 +293,8 @@
                 robotok[i].appendChild(körök[i]);
                 robotok[i].appendChild(négyzetek[i]);
                 //robotok[i].appendChild(középső_szenzor[i]);
-                robotok[i].appendChild(jobb_szenzor[i]);
-                robotok[i].appendChild(bal_szenzor[i]);
+                //robotok[i].appendChild(jobb_szenzor[i]);
+                //robotok[i].appendChild(bal_szenzor[i]);
                 robotok[i].setAttribute('id', 'robot' + i);
                 //robotok[i].setAttribute('fill', 'rgb(' + (i * 20 + 50) + ', ' + (i * 20 + 50) + ', ' + (i * 20 + 50) + ')');
                 robotok[i].setAttribute('fill', 'rgb(' + (i * 80 + 50) + ', ' + (i * 80 + 50) + ', ' + (i * 80 + 50) + ')');
@@ -243,6 +305,8 @@
                 rajzlap.appendChild(bal_pont[i]);
 
                 rajzlap.appendChild(középső_szenzor[i]);
+                rajzlap.appendChild(jobb_szenzor[i]);
+                rajzlap.appendChild(bal_szenzor[i]);
 
                 szög[i] = 0;
 
@@ -327,9 +391,9 @@
                 }
 
                 robot_pozicio_frissites();
-                középső_pont_frissites(aktuális);
-                jobb_pont_frissites(aktuális);
-                bal_pont_frissites(aktuális);
+                középső_pont_frissites();
+                jobb_pont_frissites();
+                bal_pont_frissites();
                 szenzor_adatok_kiírása();
             }
         }
@@ -396,75 +460,119 @@
             }
         }
 
-        function középső_pont_frissites(j) {
-            //var i = aktuális;
-            var középső = document.getElementById('középső' + aktuális);
-            szög[j] += 360;
-            szög[j] = szög[j] % 360;
-            szög_radián = (szög[j] * Math.PI) / 180;
-            //középső_távolság[j] = pont_frissites(középső_pont[j], szög[j], szög_radián, j) - 6;
+        function középső_pont_frissites() {
+            var i = aktuális;
+            var középső = document.getElementById('középső' + i);
+            szög[i] += 360;
+            szög[i] = szög[i] % 360;
+            szög_radián = (szög[i] * Math.PI) / 180;
+            //középső_távolság[i] = pont_frissites(középső_pont[i], szög[i], szög_radián, i) - 6;
             let x2;
             let y2;
-            let metszéspont = [];
+            let pont;
+            let egyenes = szakaszból_egyenes(szakasz_0);
+            let kezdő_pont = new Pont2D(eltolás_x[i], eltolás_y[i]);
+            let szenzor_egyenes = new Egyenes2D(kezdő_pont, szög[i]);
+            pont = két_egyenes_metszéspontja(szenzor_egyenes, egyenes);
 
-            let X0 = eltolás_x[j];
-            let Y0 = eltolás_y[j];
-            let COSA = Math.cos(szög_radián);
-            let SINA = Math.sin(szög_radián);
-            let X1 = x[0];
-            let Y1 = y[0];
-            let COSB = x[1] - x[0];
-            let SINB = y[1] - y[0];
-            let C0;
-            let C1;
-
-            C0 = (SINB * (X1 - X0) + COSB * (Y0 - Y1)) / (COSA * SINB - SINA * COSB);
-            C1 = (SINA * (X0 - X1) + COSA * (Y1 - Y0)) / (SINA * COSB - COSA * SINB);
-
-            metszéspont[0] = X0 + C0 * COSA;
-            metszéspont[1] = Y0 + C0 * SINA;
-
-            if ((((x[0] <= metszéspont[0]) && (metszéspont[0] <= x[1])) || ((x[0] >= metszéspont[0]) && (metszéspont[0] >= x[1]))) && C0 >= 0) {
-                x2 = metszéspont[0];
-                y2 = metszéspont[1];
+            if (Pont[0].x <= pont.x && pont.x <= Pont[1].x && c0 >= 0) {
+                x2 = pont.x;
+                y2 = pont.y;
 
                 középső.setAttribute('cx', x2);
                 középső.setAttribute('cy', y2);
             }
             else {
-                pont_frissites(középső_pont[j], szög[j], szög_radián, j);
+                pont_frissites(középső_pont[i], szög[i], szög_radián, i);
 
                 x2 = középső.getAttribute('cx');
                 y2 = középső.getAttribute('cy');
             }
 
-            let x1 = eltolás_x[j];
-            let y1 = eltolás_y[j];
+            let x1 = eltolás_x[i];
+            let y1 = eltolás_y[i];
 
-            középső_szenzor[aktuális].setAttribute('x1', x1);
-            középső_szenzor[aktuális].setAttribute('y1', y1);
-            középső_szenzor[aktuális].setAttribute('x2', x2);
-            középső_szenzor[aktuális].setAttribute('y2', y2);
+            középső_szenzor[i].setAttribute('x1', x1);
+            középső_szenzor[i].setAttribute('y1', y1);
+            középső_szenzor[i].setAttribute('x2', x2);
+            középső_szenzor[i].setAttribute('y2', y2);
         }
 
-        function jobb_pont_frissites(aktuális) {
+        function jobb_pont_frissites() {
             var i = aktuális;
+            var jobb = document.getElementById('jobb' + i);
             var jobb_szög;
             jobb_szög = szög[i] + 360 + 45;
             jobb_szög = jobb_szög % 360;
             var jobb_szög_radián = (jobb_szög * Math.PI) / 180;
-            pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i);
+
             //jobb_távolság[i] = pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i) - 6;
+            let x2;
+            let y2;
+            let pont;
+            let egyenes = szakaszból_egyenes(szakasz_0);
+            let kezdő_pont = new Pont2D(eltolás_x[i], eltolás_y[i]);
+            let jobb_szenzor_egyenes = new Egyenes2D(kezdő_pont, jobb_szög);
+            pont = két_egyenes_metszéspontja(jobb_szenzor_egyenes, egyenes);
+
+            if (Pont[0].x <= pont.x && pont.x <= Pont[1].x && c0 >= 0) {
+                x2 = pont.x;
+                y2 = pont.y;
+
+                jobb.setAttribute('cx', x2);
+                jobb.setAttribute('cy', y2);
+            }
+            else {
+                pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i);
+                x2 = jobb.getAttribute('cx');
+                y2 = jobb.getAttribute('cy');
+            }
+
+            let x1 = eltolás_x[i];
+            let y1 = eltolás_y[i];
+
+            jobb_szenzor[i].setAttribute('x1', x1);
+            jobb_szenzor[i].setAttribute('y1', y1);
+            jobb_szenzor[i].setAttribute('x2', x2);
+            jobb_szenzor[i].setAttribute('y2', y2);
         }
 
-        function bal_pont_frissites(aktuális) {
+        function bal_pont_frissites() {
             var i = aktuális;
+            var bal = document.getElementById('bal' + i);
             var bal_szög;
             bal_szög = szög[i] + 360 - 45;
             bal_szög = bal_szög % 360;
             var bal_szög_radián = (bal_szög * Math.PI) / 180;
-            pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i);
             //bal_távolság[i] = pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i) - 6;
+            let x2;
+            let y2;
+            let pont;
+            let egyenes = szakaszból_egyenes(szakasz_0);
+            let kezdő_pont = new Pont2D(eltolás_x[i], eltolás_y[i]);
+            let bal_szenzor_egyenes = new Egyenes2D(kezdő_pont, bal_szög);
+            pont = két_egyenes_metszéspontja(bal_szenzor_egyenes, egyenes);
+
+            if (Pont[0].x <= pont.x && pont.x <= Pont[1].x && c0 >= 0) {
+                x2 = pont.x;
+                y2 = pont.y;
+
+                bal.setAttribute('cx', x2);
+                bal.setAttribute('cy', y2);
+            }
+            else {
+                pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i);
+                x2 = bal.getAttribute('cx');
+                y2 = bal.getAttribute('cy');
+            }
+
+            let x1 = eltolás_x[i];
+            let y1 = eltolás_y[i];
+
+            bal_szenzor[i].setAttribute('x1', x1);
+            bal_szenzor[i].setAttribute('y1', y1);
+            bal_szenzor[i].setAttribute('x2', x2);
+            bal_szenzor[i].setAttribute('y2', y2);
         }
 
         function szenzor_adatok_kiírása() {
