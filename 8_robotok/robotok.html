@@ -42,6 +42,7 @@
         var aktuális = 0;
         var van_e_már_szakasz = false;
         var pont_számláló = 0;
+        var élet_állapot = []; // 1 ha az i. robot él, és 0 ha meghalt
 
         var robotok = [];
         var körök = [];
@@ -88,11 +89,6 @@
             }*/
 
         }
-
-        //let elso_pont2D = new Pont2D(0, 0);
-        //let masodik_pont2D = new Pont2D(1, 1);
-
-        //alert("A távolság = " + elso_pont2D.tavolsag(masodik_pont2D));
 
         class Szakasz2D {
             constructor(elsoPont, masodikPont) {
@@ -280,9 +276,6 @@
                 robotok[i] = document.createElementNS("http://www.w3.org/2000/svg", 'g');
                 robotok[i].appendChild(körök[i]);
                 robotok[i].appendChild(négyzetek[i]);
-                //robotok[i].appendChild(középső_szenzor[i]);
-                //robotok[i].appendChild(jobb_szenzor[i]);
-                //robotok[i].appendChild(bal_szenzor[i]);
                 robotok[i].setAttribute('id', 'robot' + i);
                 //robotok[i].setAttribute('fill', 'rgb(' + (i * 20 + 50) + ', ' + (i * 20 + 50) + ', ' + (i * 20 + 50) + ')');
                 robotok[i].setAttribute('fill', 'rgb(' + (i * 80 + 50) + ', ' + (i * 80 + 50) + ', ' + (i * 80 + 50) + ')');
@@ -302,6 +295,9 @@
                 var y_koordináta = e.pageY - rajzlap_teteje;
                 eltolás_x[i] = x_koordináta;
                 eltolás_y[i] = y_koordináta;
+
+                élet_állapot[i] = 1;
+
                 robot_pozicio_frissites();
                 középső_pont_frissites();
                 jobb_pont_frissites();
@@ -351,38 +347,41 @@
             if (körök_száma > 0) {
                 var t = ido_kulonbseg;
                 var i = aktuális;
-                w[i] = 180;
-                w[i] = w[i] * irány_kapcsoló; //a forgatás irányát határozza meg
-                szög[i] = (szög[i] + w[i] * t) % 360;
+                if (élet_állapot[i] == 1) {
+                    w[i] = 180;
+                    w[i] = w[i] * irány_kapcsoló; //a forgatás irányát határozza meg
+                    szög[i] = (szög[i] + w[i] * t) % 360;
 
-                if (megy_e_előre == true) {
-                    var v0 = 80; //pixel/sec
-                    var s0_x = eltolás_x[i];
-                    var s0_y = eltolás_y[i];
+                    if (megy_e_előre == true) {
+                        var v0 = 80; //pixel/sec
+                        var s0_x = eltolás_x[i];
+                        var s0_y = eltolás_y[i];
 
-                    var szög_radián = (szög[i] * Math.PI) / 180;
-                    var v0_x = v0 * Math.cos(szög_radián);
-                    var v0_y = v0 * Math.sin(szög_radián);
+                        var szög_radián = (szög[i] * Math.PI) / 180;
+                        var v0_x = v0 * Math.cos(szög_radián);
+                        var v0_y = v0 * Math.sin(szög_radián);
 
-                    if ((s0_x + v0_x * t < 5) || (s0_x + v0_x * t > 295)) {
-                        v0_x = 0;
+                        if ((s0_x + v0_x * t < 5) || (s0_x + v0_x * t > 295)) {
+                            v0_x = 0;
+                        }
+                        if ((s0_y + v0_y * t < 5) || (s0_y + v0_y * t > 295)) {
+                            v0_y = 0;
+                        }
+
+                        var s_x = s0_x + v0_x * t;
+                        var s_y = s0_y + v0_y * t;
+
+                        eltolás_x[i] = s_x;
+                        eltolás_y[i] = s_y;
                     }
-                    if ((s0_y + v0_y * t < 5) || (s0_y + v0_y * t > 295)) {
-                        v0_y = 0;
-                    }
 
-                    var s_x = s0_x + v0_x * t;
-                    var s_y = s0_y + v0_y * t;
-
-                    eltolás_x[i] = s_x;
-                    eltolás_y[i] = s_y;
+                    robot_pozicio_frissites();
+                    középső_pont_frissites();
+                    jobb_pont_frissites();
+                    bal_pont_frissites();
                 }
-
-                robot_pozicio_frissites();
-                középső_pont_frissites();
-                jobb_pont_frissites();
-                bal_pont_frissites();
                 szenzor_adatok_kiírása();
+                élet_állapot_ellenőrzés();
             }
         }
 
@@ -579,10 +578,24 @@
             jobb_távolság[i] = kezdő_pont.tavolsag(jobbPont);
             bal_távolság[i] = kezdő_pont.tavolsag(balPont);
 
-            document.getElementById("robot_index").innerHTML = i;
+            if (élet_állapot[i] == 1) {
+                document.getElementById("robot_index").innerHTML = i + ' ÉL';
+            }
+            else{
+                document.getElementById("robot_index").innerHTML = i + ' HALOTT';
+            }
             document.getElementById("középső_szenzor_távolság").innerHTML = középső_távolság[i];
             document.getElementById("jobb_szenzor_távolság").innerHTML = jobb_távolság[i];
             document.getElementById("bal_szenzor_távolság").innerHTML = bal_távolság[i];
+        }
+
+        function élet_állapot_ellenőrzés() {
+            var i = aktuális;
+            var robot = document.getElementById('robot' + i);
+            if (középső_távolság[i] < 6 || jobb_távolság[i] < 6 || bal_távolság[i] < 6) {
+                élet_állapot[i] = 0;
+                robot.setAttribute('fill', 'red');
+            }
         }
 
         function pitagoras(a, b) {
