@@ -42,6 +42,7 @@
         var aktuális = 0;
         var van_e_már_szakasz = false;
         var robot_következik = true;
+        var szakasz_következik = false;
         var pont_számláló = 0;
         var élet_állapot = []; // 1 ha az i. robot él, és 0 ha meghalt
 
@@ -60,7 +61,8 @@
         var x = [];
         var y = [];
         var Pont = [];
-        var szakasz_0;
+        var SZAKASZ = [];
+        var SZAKASZ_számláló = 0;
         var c0;
 
         class Pont2D {
@@ -137,7 +139,9 @@
             if (robot_következik) {
                 robot_létrehozás(e);
             }
-            szakasz_létrehozás(e);
+            if (szakasz_következik) {
+                szakasz_létrehozás(e);
+            }
         }
 
         function szakasz_létrehozás(e) {
@@ -159,6 +163,7 @@
                 pont_számláló++;
             }
             if (pont_számláló == 2) {
+                let i = SZAKASZ_számláló;
                 let szakasz = document.createElementNS("http://www.w3.org/2000/svg", 'line');
                 szakasz.setAttribute('x1', x[0]);
                 szakasz.setAttribute('y1', y[0]);
@@ -167,10 +172,12 @@
                 szakasz.setAttribute('stroke', 'red');
                 rajzlap.appendChild(szakasz);
 
+                pont_számláló++;
                 van_e_már_szakasz = true;
                 robot_következik = true;
-                szakasz_0 = new Szakasz2D(Pont[0], Pont[1]);
-                szakasz_0 = szakasz_rendezés(szakasz_0);
+                SZAKASZ[i] = new Szakasz2D(Pont[0], Pont[1]);
+                SZAKASZ[i] = szakasz_rendezés(SZAKASZ[i]);
+                SZAKASZ_számláló++;
             }
         }
 
@@ -398,118 +405,75 @@
             }
         }
 
-        function középső_pont_frissites() {
-            var i = aktuális;
-            var középső = document.getElementById('középső' + i);
-            szög[i] += 360;
-            szög[i] = szög[i] % 360;
-            szög_radián = (szög[i] * Math.PI) / 180;
-
+        function hol_lesz_a_metszéspont(SZÖG, SZÖG_RADIÁN, melyik_pont, melyik_szenzor) {
+            let ez_lesz_a_jó = - 1;
+            let legkisebb_távolság = 1000;
+            let x1 = eltolás_x[aktuális];
+            let y1 = eltolás_y[aktuális];
             let x2;
             let y2;
             let pont;
-            let egyenes = szakaszból_egyenes(szakasz_0);
-            let kezdő_pont = new Pont2D(eltolás_x[i], eltolás_y[i]);
-            let szenzor_egyenes = new Egyenes2D(kezdő_pont, szög[i]);
-            pont = két_egyenes_metszéspontja(szenzor_egyenes, egyenes);
+            let egyenes;
+            let kezdő_pont = new Pont2D(eltolás_x[aktuális], eltolás_y[aktuális]);
+            let szenzor_egyenes = new Egyenes2D(kezdő_pont, SZÖG);
 
-            if (Pont[0].x <= pont.x && pont.x <= Pont[1].x && c0 >= 0) {
-                x2 = pont.x;
-                y2 = pont.y;
+            for (let k = 0; k < SZAKASZ_számláló; k++) {
+                egyenes = szakaszból_egyenes(SZAKASZ[k]);
+                pont = két_egyenes_metszéspontja(szenzor_egyenes, egyenes);
+                if (SZAKASZ[k].elsoPont.x <= pont.x && pont.x <= SZAKASZ[k].masikPont.x && c0 >= 0) {
+                    let aktuális_távolság = kezdő_pont.tavolsag(pont);
+                    if (aktuális_távolság < legkisebb_távolság) {
+                        legkisebb_távolság = aktuális_távolság;
+                        ez_lesz_a_jó = k;
+                    }
+                }
 
-                középső.setAttribute('cx', x2);
-                középső.setAttribute('cy', y2);
+            }
+
+            if (ez_lesz_a_jó < 0) {
+                pont_frissites(melyik_pont[aktuális], SZÖG, SZÖG_RADIÁN, aktuális);
+                x2 = melyik_pont[aktuális].getAttribute('cx');
+                y2 = melyik_pont[aktuális].getAttribute('cy');
             }
             else {
-                pont_frissites(középső_pont[i], szög[i], szög_radián, i);
-
-                x2 = középső.getAttribute('cx');
-                y2 = középső.getAttribute('cy');
+                egyenes = szakaszból_egyenes(SZAKASZ[ez_lesz_a_jó]);
+                pont = két_egyenes_metszéspontja(szenzor_egyenes, egyenes);
+                x2 = pont.x;
+                y2 = pont.y;
+                melyik_pont[aktuális].setAttribute('cx', x2);
+                melyik_pont[aktuális].setAttribute('cy', y2);
             }
 
-            let x1 = eltolás_x[i];
-            let y1 = eltolás_y[i];
+            melyik_szenzor[aktuális].setAttribute('x1', x1);
+            melyik_szenzor[aktuális].setAttribute('y1', y1);
+            melyik_szenzor[aktuális].setAttribute('x2', x2);
+            melyik_szenzor[aktuális].setAttribute('y2', y2);
+        }
 
-            középső_szenzor[i].setAttribute('x1', x1);
-            középső_szenzor[i].setAttribute('y1', y1);
-            középső_szenzor[i].setAttribute('x2', x2);
-            középső_szenzor[i].setAttribute('y2', y2);
+        function középső_pont_frissites() {
+            szög[aktuális] += 360;
+            szög[aktuális] = szög[aktuális] % 360;
+            szög_radián = (szög[aktuális] * Math.PI) / 180;
+
+            hol_lesz_a_metszéspont(szög[aktuális], szög_radián, középső_pont, középső_szenzor);
         }
 
         function jobb_pont_frissites() {
-            var i = aktuális;
-            var jobb = document.getElementById('jobb' + i);
             var jobb_szög;
-            jobb_szög = szög[i] + 360 + 45;
+            jobb_szög = szög[aktuális] + 360 + 45;
             jobb_szög = jobb_szög % 360;
             var jobb_szög_radián = (jobb_szög * Math.PI) / 180;
 
-            let x2;
-            let y2;
-            let pont;
-            let egyenes = szakaszból_egyenes(szakasz_0);
-            let kezdő_pont = new Pont2D(eltolás_x[i], eltolás_y[i]);
-            let jobb_szenzor_egyenes = new Egyenes2D(kezdő_pont, jobb_szög);
-            pont = két_egyenes_metszéspontja(jobb_szenzor_egyenes, egyenes);
-
-            if (Pont[0].x <= pont.x && pont.x <= Pont[1].x && c0 >= 0) {
-                x2 = pont.x;
-                y2 = pont.y;
-
-                jobb.setAttribute('cx', x2);
-                jobb.setAttribute('cy', y2);
-            }
-            else {
-                pont_frissites(jobb_pont[i], jobb_szög, jobb_szög_radián, i);
-                x2 = jobb.getAttribute('cx');
-                y2 = jobb.getAttribute('cy');
-            }
-
-            let x1 = eltolás_x[i];
-            let y1 = eltolás_y[i];
-
-            jobb_szenzor[i].setAttribute('x1', x1);
-            jobb_szenzor[i].setAttribute('y1', y1);
-            jobb_szenzor[i].setAttribute('x2', x2);
-            jobb_szenzor[i].setAttribute('y2', y2);
+            hol_lesz_a_metszéspont(jobb_szög, jobb_szög_radián, jobb_pont, jobb_szenzor);
         }
 
         function bal_pont_frissites() {
-            var i = aktuális;
-            var bal = document.getElementById('bal' + i);
             var bal_szög;
-            bal_szög = szög[i] + 360 - 45;
+            bal_szög = szög[aktuális] + 360 - 45;
             bal_szög = bal_szög % 360;
             var bal_szög_radián = (bal_szög * Math.PI) / 180;
 
-            let x2;
-            let y2;
-            let pont;
-            let egyenes = szakaszból_egyenes(szakasz_0);
-            let kezdő_pont = new Pont2D(eltolás_x[i], eltolás_y[i]);
-            let bal_szenzor_egyenes = new Egyenes2D(kezdő_pont, bal_szög);
-            pont = két_egyenes_metszéspontja(bal_szenzor_egyenes, egyenes);
-
-            if (Pont[0].x <= pont.x && pont.x <= Pont[1].x && c0 >= 0) {
-                x2 = pont.x;
-                y2 = pont.y;
-
-                bal.setAttribute('cx', x2);
-                bal.setAttribute('cy', y2);
-            }
-            else {
-                pont_frissites(bal_pont[i], bal_szög, bal_szög_radián, i);
-                x2 = bal.getAttribute('cx');
-                y2 = bal.getAttribute('cy');
-            }
-
-            let x1 = eltolás_x[i];
-            let y1 = eltolás_y[i];
-
-            bal_szenzor[i].setAttribute('x1', x1);
-            bal_szenzor[i].setAttribute('y1', y1);
-            bal_szenzor[i].setAttribute('x2', x2);
-            bal_szenzor[i].setAttribute('y2', y2);
+            hol_lesz_a_metszéspont(bal_szög, bal_szög_radián, bal_pont, bal_szenzor);
         }
 
         function szenzor_adatok_kiírása() {
@@ -547,12 +511,13 @@
                 robot.setAttribute('fill', 'red');
             }
         }
-    
-    function SZAKASZ_létrehozás(){
-        alert("én is sok mindent szeretnék");
-        pont_számláló = 0;
-        robot_következik = false;
-    }
+
+        function SZAKASZ_létrehozás() {
+            alert("én is sok mindent szeretnék");
+            pont_számláló = 0;
+            szakasz_következik = true;
+            robot_következik = false;
+        }
     </script>
     <button onclick="SZAKASZ_létrehozás()">Szeretnék lerakni még egy szakaszt.</button>
     <p>alább írjuk ki az aktuálisan mozgatott robot indexét:</p>
