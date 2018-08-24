@@ -41,6 +41,7 @@
         var irány_kapcsoló = 0;
         var aktuális = 0;
         var van_e_már_szakasz = false;
+        var robot_következik = true;
         var pont_számláló = 0;
         var élet_állapot = []; // 1 ha az i. robot él, és 0 ha meghalt
 
@@ -133,7 +134,7 @@
         setInterval(szimulacio_indito, 10);
 
         function klikkelés(e) {
-            if (van_e_már_szakasz) {
+            if (robot_következik) {
                 robot_létrehozás(e);
             }
             szakasz_létrehozás(e);
@@ -167,6 +168,7 @@
                 rajzlap.appendChild(szakasz);
 
                 van_e_már_szakasz = true;
+                robot_következik = true;
                 szakasz_0 = new Szakasz2D(Pont[0], Pont[1]);
                 szakasz_0 = szakasz_rendezés(szakasz_0);
             }
@@ -545,7 +547,14 @@
                 robot.setAttribute('fill', 'red');
             }
         }
+    
+    function SZAKASZ_létrehozás(){
+        alert("én is sok mindent szeretnék");
+        pont_számláló = 0;
+        robot_következik = false;
+    }
     </script>
+    <button onclick="SZAKASZ_létrehozás()">Szeretnék lerakni még egy szakaszt.</button>
     <p>alább írjuk ki az aktuálisan mozgatott robot indexét:</p>
     <p id="robot_index"></p>
     <p>a középső szenzor által mért távolság:</p>
